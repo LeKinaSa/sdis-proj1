@@ -1,7 +1,23 @@
+import java.rmi.registry.LocateRegistry;
+import java.rmi.registry.Registry;
+
 public class ClientCommand {
     public int accessPoint;
     ClientCommand(String[] args) {
         this.accessPoint = Integer.parseInt(args[0]);
+    }
+
+    void test() {
+        String host = "localhost";
+        try {
+            Registry registry = LocateRegistry.getRegistry(host);
+            ServerCommands stub = (ServerCommands) registry.lookup("Hello");
+            String response = stub.status();
+            System.out.println("response: " + response);
+        } catch (Exception e) {
+            System.err.println("Client exception: " + e.toString());
+            e.printStackTrace();
+        }
     }
 
     public static ClientCommand parseArgs(String[] args) {
