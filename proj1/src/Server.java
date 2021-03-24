@@ -1,6 +1,7 @@
 
 import java.rmi.registry.Registry;
 import java.rmi.registry.LocateRegistry;
+import java.io.Console;
 import java.rmi.RemoteException;
 import java.rmi.server.UnicastRemoteObject;
 import java.util.HashSet;
@@ -21,5 +22,8 @@ public class Server {
             System.err.println("Server exception: " + e.toString());
             e.printStackTrace();
         }
+
+
+        // More services here
     }
 }
