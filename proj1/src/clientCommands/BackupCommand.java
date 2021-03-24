@@ -14,5 +14,14 @@ public class BackupCommand extends ClientCommand {
         this.file = args[2];
         this.replicationFactor = Integer.parseInt(args[3]);
     }
-   
+    
+    public void execute() {
+        System.out.println("hi");
+        try {
+            stub.backupFile("", new byte[0], 0);
+        } catch (Exception e) {
+            System.err.println("Client exception: " + e.toString());
+            e.printStackTrace();
+        }
+    }
 }

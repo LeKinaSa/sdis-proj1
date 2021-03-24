@@ -15,6 +15,7 @@ public class TestApp {
         try {
             command = ClientCommand.parseArgs(args);
             System.out.println("Args successfully parsed");
+            command.execute();
         }
         catch (IllegalArgumentException ex) {
             return;

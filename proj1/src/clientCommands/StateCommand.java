@@ -9,5 +9,16 @@ public class StateCommand extends ClientCommand {
             throw new IllegalArgumentException();
         }
     }
+
+    public void execute() {
+        System.out.println("hi");
+        try {
+            String response = stub.state();
+            System.out.println("response: " + response);
+        } catch (Exception e) {
+            System.err.println("Client exception: " + e.toString());
+            e.printStackTrace();
+        }
+    }
     
 }

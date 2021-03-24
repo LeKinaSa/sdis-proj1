@@ -12,4 +12,14 @@ public class ReclaimCommand extends ClientCommand {
 
         this.diskSpace = Integer.parseInt(args[2]);
     }
+
+    public void execute() {
+        System.out.println("hi");
+        try {
+            stub.reclaimSpace(0);
+        } catch (Exception e) {
+            System.err.println("Client exception: " + e.toString());
+            e.printStackTrace();
+        }
+    }
 }

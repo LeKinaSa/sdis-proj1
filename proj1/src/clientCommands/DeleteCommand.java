@@ -12,4 +12,14 @@ public class DeleteCommand extends ClientCommand {
         
         this.file = args[2];
     }
+
+    public void execute() {
+        System.out.println("hi");
+        try {
+            stub.deleteFile("");
+        } catch (Exception e) {
+            System.err.println("Client exception: " + e.toString());
+            e.printStackTrace();
+        }
+    }
 }

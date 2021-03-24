@@ -1,23 +1,27 @@
 public class ClientEndpoint implements ServerCommands {
 
     public void backupFile(String fileName, byte[] fileContents, int replicationDegree) {
-        //
+        System.out.println("backupFile()");
     }
 
     public byte[] restoreFile(String fileName) {
+        System.out.println("restoreFile()");
         return new byte[0];
     }
 
     public void deleteFile(String fileName) {
-        //
+        System.out.println("deleteFile()");
+
     }
 
     public void reclaimSpace(int space) {
-        //
+        System.out.println("reclaimSpace()");
+
     }
 
     public String state() {
-        return "hi";
+        System.out.println("state()");
+        return "hello";
     }
 
 
