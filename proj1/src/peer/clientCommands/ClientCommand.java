@@ -1,5 +1,9 @@
+package peer.clientCommands;
+
 import java.rmi.registry.LocateRegistry;
 import java.rmi.registry.Registry;
+
+import peer.ServerCommands;
 
 public abstract class ClientCommand {
     public int accessPoint;

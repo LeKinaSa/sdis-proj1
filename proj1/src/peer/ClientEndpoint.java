@@ -1,3 +1,5 @@
+package peer;
+
 import java.util.Arrays;
 
 public class ClientEndpoint implements ServerCommands {

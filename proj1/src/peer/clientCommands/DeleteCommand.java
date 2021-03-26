@@ -1,3 +1,5 @@
+package peer.clientCommands;
+
 public class DeleteCommand extends ClientCommand {
     private String file;
 

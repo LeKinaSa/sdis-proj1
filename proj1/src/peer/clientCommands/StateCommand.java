@@ -1,3 +1,5 @@
+package peer.clientCommands;
+
 public class StateCommand extends ClientCommand {
 
     public StateCommand(String args[]) {

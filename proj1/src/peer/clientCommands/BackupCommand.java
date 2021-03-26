@@ -1,3 +1,5 @@
+package peer.clientCommands;
+
 import java.io.*;
 
 public class BackupCommand extends ClientCommand {

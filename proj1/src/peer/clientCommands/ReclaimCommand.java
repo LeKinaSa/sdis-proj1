@@ -1,3 +1,5 @@
+package peer.clientCommands;
+
 public class ReclaimCommand extends ClientCommand {
     private int diskSpace; // Disk Space Used to Store the Chunks (in KByte)
     

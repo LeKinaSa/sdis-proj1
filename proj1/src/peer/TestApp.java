@@ -1,5 +1,9 @@
+package peer;
+
 import java.io.Console;
 import java.util.Arrays;
+
+import peer.clientCommands.ClientCommand;
 
 // $ java TestApp <peer_ap> <sub_protocol> <opnd_1> <opnd_2>
 

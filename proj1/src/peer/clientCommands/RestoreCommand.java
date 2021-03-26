@@ -1,3 +1,5 @@
+package peer.clientCommands;
+
 public class RestoreCommand extends ClientCommand {
     private String file;
 
