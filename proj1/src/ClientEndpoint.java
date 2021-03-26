@@ -1,7 +1,7 @@
 import java.io.*;
 
 public class ClientEndpoint implements ServerCommands {
-    private int CHUNK_SIZE = 1; // TODO: Find this value
+    private final int CHUNK_SIZE = 64000;
 
     public void backupFile(String fileName, byte[] fileContents, int replicationDegree) {
         System.out.println("backupFile()");
@@ -16,21 +16,33 @@ public class ClientEndpoint implements ServerCommands {
         }
 
         int fileSize = (int) file.length();
-        
-        for (int i = 0; i < fileSize / CHUNK_SIZE; i ++) {
-            // Backup Chunk
-            // Maybe: while loop since reading from in may cause exception
+        int bytesRead = 0;
+        int readSize;
+        while (bytesRead < fileSize) {
+            readSize = Math.min(CHUNK_SIZE, fileSize - bytesRead);
+            byte[] buffer = new byte[readSize];
+            try {
+                readSize = in.read(buffer);
+            }
+            catch (IOException exception) {
+                continue;
+            }
+            bytesRead += readSize;
+
+            // Backup Chunk in buffer
+            // TODO
         }
 
-        // Last chunk (incomplete)
-        // If there's no incomplete chunk to backup, backup chunk with 0 size
+        // Last chunk needs to be incomplete
+        if (fileSize % CHUNK_SIZE == 0) {
+            // Backup Chunk with size 0
+            // TODO
+        }
 
         try {
             in.close();
         }
-        catch (IOException exception) {
-
-        }
+        catch (IOException exception) { }
     }
 
     public byte[] restoreFile(String fileName) {
