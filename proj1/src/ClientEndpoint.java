@@ -1,48 +1,33 @@
-import java.io.*;
+import java.util.Arrays;
 
 public class ClientEndpoint implements ServerCommands {
     private final int CHUNK_SIZE = 64000;
 
     public void backupFile(String fileName, byte[] fileContents, int replicationDegree) {
         System.out.println("backupFile()");
-        File file = new File(fileName);
-        FileInputStream in = null;
-        try {
-            in = new FileInputStream(file);
-        }
-        catch (FileNotFoundException exception) {
-            System.out.println("File: " + fileName + " not found");
-            return;
-        }
 
-        int fileSize = (int) file.length();
-        int bytesRead = 0;
-        int readSize;
-        while (bytesRead < fileSize) {
-            readSize = Math.min(CHUNK_SIZE, fileSize - bytesRead);
-            byte[] buffer = new byte[readSize];
-            try {
-                readSize = in.read(buffer);
-            }
-            catch (IOException exception) {
-                continue;
-            }
-            bytesRead += readSize;
+        int fileSize = fileContents.length;
+        int backedUp = 0;
+        int toBackUp;
 
-            // Backup Chunk in buffer
-            // TODO
+        while (backedUp < fileSize) {
+            toBackUp = Math.min(CHUNK_SIZE, fileSize - backedUp);
+
+            // Backup Chunk [backedUp, backedUp + toBackUp[
+            backupChunk(Arrays.copyOfRange(fileContents, backedUp, backedUp + toBackUp), replicationDegree);
+            backedUp += toBackUp;
         }
 
-        // Last chunk needs to be incomplete
+        // File size is a multiple of the chunk size
         if (fileSize % CHUNK_SIZE == 0) {
             // Backup Chunk with size 0
-            // TODO
+            backupChunk(new byte[0], replicationDegree);
         }
+    }
 
-        try {
-            in.close();
-        }
-        catch (IOException exception) { }
+    private void backupChunk(byte[] chunkContent, int replicationDegree) {
+        System.out.println("backup chunk with size:" + chunkContent.length);
+        // TODO: implement
     }
 
     public byte[] restoreFile(String fileName) {
