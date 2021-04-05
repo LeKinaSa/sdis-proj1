@@ -3,7 +3,8 @@ package peer;
 import java.util.Arrays;
 
 public class ClientEndpoint implements ServerCommands {
-    private final int CHUNK_SIZE = 64000;
+    private static final int CHUNK_SIZE = 64000;
+    private MessageMaker messageMaker;
 
     public void backupFile(String fileName, byte[] fileContents, int replicationDegree) {
         System.out.println("backupFile()");
@@ -11,25 +12,32 @@ public class ClientEndpoint implements ServerCommands {
         int fileSize = fileContents.length;
         int backedUp = 0;
         int toBackUp;
+        int chunk = 0;
 
         while (backedUp < fileSize) {
             toBackUp = Math.min(CHUNK_SIZE, fileSize - backedUp);
 
             // Backup Chunk [backedUp, backedUp + toBackUp[
-            backupChunk(Arrays.copyOfRange(fileContents, backedUp, backedUp + toBackUp), replicationDegree);
+            backupChunk(Arrays.copyOfRange(fileContents, backedUp, backedUp + toBackUp), replicationDegree, fileName, chunk);
             backedUp += toBackUp;
+            chunk += 1;
         }
 
         // File size is a multiple of the chunk size
         if (fileSize % CHUNK_SIZE == 0) {
             // Backup Chunk with size 0
-            backupChunk(new byte[0], replicationDegree);
+            backupChunk(new byte[0], replicationDegree, fileName, chunk);
         }
     }
 
-    private void backupChunk(byte[] chunkContent, int replicationDegree) {
+    private void backupChunk(byte[] chunkContent, int replicationDegree, String fileId, int chunkNo) {
         System.out.println("backup chunk with size:" + chunkContent.length);
         // TODO: implement
+
+        // Get Message
+        byte[] message = this.messageMaker.backupSender(fileId, chunkNo, replicationDegree, chunkContent);
+        // Send Message
+
     }
 
     public byte[] restoreFile(String fileName) {
@@ -56,7 +64,7 @@ public class ClientEndpoint implements ServerCommands {
 
 
     public ClientEndpoint() {
-        ////
+        this.messageMaker = new MessageMaker("1.0", 1);
     }
 
 }

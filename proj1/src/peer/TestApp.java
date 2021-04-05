@@ -1,6 +1,5 @@
 package peer;
 
-import java.io.Console;
 import java.util.Arrays;
 
 import peer.clientCommands.ClientCommand;
