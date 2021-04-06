@@ -13,10 +13,11 @@ public abstract class ClientCommand {
         this.accessPoint = Integer.parseInt(args[0]);
         try {
         Registry registry = LocateRegistry.getRegistry();
-        this.stub = (ServerCommands) registry.lookup("Hello");
-        } catch (Exception e) {
-            System.err.println("Client exception: " + e.toString());
-            e.printStackTrace();
+        this.stub = (ServerCommands) registry.lookup(args[0]);
+        }
+        catch (Exception exception) {
+            System.err.println("Client exception: " + exception.toString());
+            exception.printStackTrace();
         }
     }
 
