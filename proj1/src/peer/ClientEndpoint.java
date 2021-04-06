@@ -1,7 +1,9 @@
 package peer;
 
+import java.io.IOException;
+import java.net.DatagramPacket;
+import java.net.DatagramSocket;
 import java.net.InetAddress;
-import java.net.MulticastSocket;
 import java.util.Arrays;
 
 public class ClientEndpoint implements ServerCommands { // Peer endpoint that the client reaches out
@@ -55,12 +57,11 @@ public class ClientEndpoint implements ServerCommands { // Peer endpoint that th
 
     private void backupChunk(byte[] chunkContent, int replicationDegree, String fileId, int chunkNo) {
         System.out.println("backup chunk with size:" + chunkContent.length);
-        // TODO: implement
 
         // Get Message
         byte[] message = this.messageMaker.backupSender(fileId, chunkNo, replicationDegree, chunkContent);
         // Send Message
-        //canal certo -> mandar mensagem
+        this.sendMessage(ipMDB, portMDB, message);
     }
 
     public byte[] restoreFile(String fileName) {
@@ -85,4 +86,15 @@ public class ClientEndpoint implements ServerCommands { // Peer endpoint that th
         return "hello";
     }
 
+    private void sendMessage(InetAddress ip, int port, byte[] buf) {
+        DatagramSocket socket = new DatagramSocket(); 
+        DatagramPacket packet = new DatagramPacket(buf, buf.length, ip, port);
+        try {
+            socket.send(packet);
+        }
+        catch (IOException exception) {
+
+        }
+        socket.close();
+    }
 }

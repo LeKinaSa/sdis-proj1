@@ -3,6 +3,7 @@ package peer;
 import java.net.UnknownHostException;
 import java.rmi.registry.Registry;
 import java.rmi.registry.LocateRegistry;
+import java.io.IOException;
 import java.net.InetAddress;
 import java.net.MulticastSocket;
 import java.rmi.server.UnicastRemoteObject;
@@ -85,5 +86,29 @@ public class Server {
             tempPort = Integer.parseInt(list[1]);
         }
         catch (NumberFormatException ignored) { }
+    }
+
+    public static void receiveMessage(InetAddress ip, int port) {
+        MulticastSocket socket;
+        try {
+            socket = new MulticastSocket(port);
+        } catch (IOException exception) {
+            return;
+        }
+        try {
+            socket.joinGroup(ip);
+        } catch (IOException e) {
+            socket.close();
+            return;
+        }
+        // TODO: read message
+        try {
+            socket.leaveGroup(ip);
+        }
+        catch (Exception exception) {
+            socket.close();
+            return;
+        }
+        socket.close();
     }
 }
