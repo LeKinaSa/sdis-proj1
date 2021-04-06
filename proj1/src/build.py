@@ -1,6 +1,14 @@
-import subprocess, pathlib, os
+import subprocess, pathlib, os, shutil
 
-os.chdir(pathlib.Path(__file__).parent)
+src = pathlib.Path(__file__).parent
+out = src.parent / 'out'
+
+os.chdir(src)
+
+try:
+    shutil.rmtree(out / 'peer') # Remove what was there before
+except FileNotFoundError:
+    pass
 
 directories = ["peer", "peer/clientCommands"]
 
