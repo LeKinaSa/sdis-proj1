@@ -11,7 +11,7 @@ public class BackupCommand extends ClientCommand {
         assert (args[1].equals("BACKUP"));
 
         if (args.length != 4) {
-            System.out.println("java TestApp <peer_ap> BACKUP <file> <replicationFactor>");
+            System.out.println("java peer.TestApp <peer_ap> BACKUP <file> <replicationFactor>");
             throw new IllegalArgumentException();
         }
 
@@ -20,7 +20,7 @@ public class BackupCommand extends ClientCommand {
     }
     
     public void execute() {
-        System.out.println("hi");
+        System.out.println("Executing backup...");
         try {
             File file = new File(this.fileName);
             FileInputStream in = null;
