@@ -1,0 +1,5 @@
+*.class
+
+proj1/.idea/*
+proj1/proj1.iml
+proj1/out/*
