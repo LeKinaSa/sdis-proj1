@@ -4,6 +4,7 @@ import java.net.UnknownHostException;
 import java.rmi.registry.Registry;
 import java.rmi.registry.LocateRegistry;
 import java.io.IOException;
+import java.net.DatagramPacket;
 import java.net.InetAddress;
 import java.net.MulticastSocket;
 import java.rmi.server.UnicastRemoteObject;
@@ -42,7 +43,7 @@ public class Server {
 
             // Bind the remote object's stub in the registry
             Registry registry = LocateRegistry.getRegistry();
-            registry.bind("Hello", stub);
+            registry.bind(accessPoint, stub);
 
             System.err.println("Server ready");
         }
@@ -71,6 +72,8 @@ public class Server {
         ipMDR = tempIp;
         portMDR = tempPort;
         obj.setMDR(ipMDR, portMDR);
+
+        System.err.println("Server ready");
     }
 
     private static void getInformationFromArg(String arg) {
@@ -88,27 +91,39 @@ public class Server {
         catch (NumberFormatException ignored) { }
     }
 
-    public static void receiveMessage(InetAddress ip, int port) {
+    public static boolean receiveMessage(InetAddress ip, int port) {
         MulticastSocket socket;
         try {
             socket = new MulticastSocket(port);
         } catch (IOException exception) {
-            return;
+            return false;
         }
         try {
             socket.joinGroup(ip);
         } catch (IOException e) {
             socket.close();
-            return;
+            return false;
         }
+        
         // TODO: read message
+        byte[] buf = new byte[8];
+        DatagramPacket p = new DatagramPacket(buf, buf.length);
+        try {
+            socket.receive(p);
+        }
+        catch (IOException exception) {
+            socket.close();
+            return false;
+        }
+
         try {
             socket.leaveGroup(ip);
         }
         catch (Exception exception) {
             socket.close();
-            return;
+            return true;
         }
         socket.close();
+        return true;
     }
 }
