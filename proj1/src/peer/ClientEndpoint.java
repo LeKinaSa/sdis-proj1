@@ -1,17 +1,32 @@
 package peer;
 
+import java.net.InetAddress;
+import java.net.MulticastSocket;
 import java.util.Arrays;
 
 public class ClientEndpoint implements ServerCommands { // Peer endpoint that the client reaches out
     private static final int CHUNK_SIZE = 64000;
     private MessageMaker messageMaker;
-    private String mc, mdb, mdr;
+    private static InetAddress ipMC, ipMDB, ipMDR;
+    private static int portMC, portMDB, portMDR;
 
-    public ClientEndpoint() {
-        this.messageMaker = new MessageMaker("1.0", 1);
-        this.mc = ""; // Multicast Control Channel
-        this.mdb = ""; // Multicast Data Backup Channel
-        this.mdr = ""; // Multicast Data Restore Channel
+    public ClientEndpoint(String version, int id) {
+        this.messageMaker = new MessageMaker(version, id);
+    }
+
+    public void setMC(InetAddress ip, int port) {
+        this.ipMC = ip;
+        this.portMC = port;
+    }
+
+    public void setMDB(InetAddress ip, int port) {
+        this.ipMDB = ip;
+        this.portMDB = port;
+    }
+
+    public void setMDR(InetAddress ip, int port) {
+        this.ipMDR = ip;
+        this.portMDR = port;
     }
 
     public void backupFile(String fileName, byte[] fileContents, int replicationDegree) {
