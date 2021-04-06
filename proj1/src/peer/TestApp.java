@@ -18,7 +18,6 @@ public class TestApp {
         try {
             command = ClientCommand.parseArgs(args);
             System.out.println("Args successfully parsed");
-            command.execute();
         }
         catch (IllegalArgumentException ex) {
             return;
@@ -28,7 +27,7 @@ public class TestApp {
             System.out.println("sub_protocol: STATE | BACKUP | DELETE | RESTORE | RECLAIM");
             return;
         }
-
+        command.execute();
         // 
         System.out.println(Arrays.toString(args));
     }    
