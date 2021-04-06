@@ -2,9 +2,17 @@ package peer;
 
 import java.util.Arrays;
 
-public class ClientEndpoint implements ServerCommands {
+public class ClientEndpoint implements ServerCommands { // Peer endpoint that the client reaches out
     private static final int CHUNK_SIZE = 64000;
     private MessageMaker messageMaker;
+    private String mc, mdb, mdr;
+
+    public ClientEndpoint() {
+        this.messageMaker = new MessageMaker("1.0", 1);
+        this.mc = ""; // Multicast Control Channel
+        this.mdb = ""; // Multicast Data Backup Channel
+        this.mdr = ""; // Multicast Data Restore Channel
+    }
 
     public void backupFile(String fileName, byte[] fileContents, int replicationDegree) {
         System.out.println("backupFile()");
@@ -37,7 +45,7 @@ public class ClientEndpoint implements ServerCommands {
         // Get Message
         byte[] message = this.messageMaker.backupSender(fileId, chunkNo, replicationDegree, chunkContent);
         // Send Message
-
+        //canal certo -> mandar mensagem
     }
 
     public byte[] restoreFile(String fileName) {
@@ -60,11 +68,6 @@ public class ClientEndpoint implements ServerCommands {
         System.out.println("state()");
         //TODO: implement
         return "hello";
-    }
-
-
-    public ClientEndpoint() {
-        this.messageMaker = new MessageMaker("1.0", 1);
     }
 
 }
