@@ -4,6 +4,7 @@ import java.io.IOException;
 import java.net.DatagramPacket;
 import java.net.DatagramSocket;
 import java.net.InetAddress;
+import java.net.SocketException;
 import java.util.Arrays;
 
 public class ClientEndpoint implements ServerCommands { // Peer endpoint that the client reaches out
@@ -86,15 +87,22 @@ public class ClientEndpoint implements ServerCommands { // Peer endpoint that th
         return "hello";
     }
 
-    private void sendMessage(InetAddress ip, int port, byte[] buf) {
-        DatagramSocket socket = new DatagramSocket(); 
+    private boolean sendMessage(InetAddress ip, int port, byte[] buf) {
+        DatagramSocket socket;
+        try {
+            socket = new DatagramSocket();
+        }
+        catch (SocketException exception) {
+            return false;
+        }
         DatagramPacket packet = new DatagramPacket(buf, buf.length, ip, port);
         try {
             socket.send(packet);
         }
         catch (IOException exception) {
-
+            return false;
         }
         socket.close();
+        return true;
     }
 }

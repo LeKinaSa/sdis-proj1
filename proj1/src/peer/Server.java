@@ -20,7 +20,7 @@ public class Server {
         // Args: <protocol version> <peer id> <service access point> <MC> <MDB> <MDR>
         // Parse Args
         if (args.length != 6) {
-            System.out.println("java peer.Server <protocol_version> <peer_id> <service_acess_point> <MC> <MDB> <MDR>");
+            System.out.println("java peer.Server <protocol_version> <peer_id> <service_access_point> <MC> <MDB> <MDR>");
             return;
         }
         String version = args[0];
