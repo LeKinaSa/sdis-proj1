@@ -3,10 +3,7 @@ package peer;
 import java.net.UnknownHostException;
 import java.rmi.registry.Registry;
 import java.rmi.registry.LocateRegistry;
-import java.io.IOException;
-import java.net.DatagramPacket;
 import java.net.InetAddress;
-import java.net.MulticastSocket;
 import java.rmi.server.UnicastRemoteObject;
         
 
@@ -104,42 +101,6 @@ public class Server {
         catch (NumberFormatException exception) {
             return false;
         }
-        return true;
-    }
-
-    public static boolean receiveMessage(InetAddress ip, int port) {
-        MulticastSocket socket;
-        try {
-            socket = new MulticastSocket(port);
-        } catch (IOException exception) {
-            return false;
-        }
-        try {
-            socket.joinGroup(ip);
-        } catch (IOException e) {
-            socket.close();
-            return false;
-        }
-        
-        // TODO: read message
-        byte[] buf = new byte[8];
-        DatagramPacket p = new DatagramPacket(buf, buf.length);
-        try {
-            socket.receive(p);
-        }
-        catch (IOException exception) {
-            socket.close();
-            return false;
-        }
-
-        try {
-            socket.leaveGroup(ip);
-        }
-        catch (Exception exception) {
-            socket.close();
-            return true;
-        }
-        socket.close();
         return true;
     }
 }
