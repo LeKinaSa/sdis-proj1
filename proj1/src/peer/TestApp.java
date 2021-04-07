@@ -4,14 +4,14 @@ import java.util.Arrays;
 
 import peer.clientCommands.ClientCommand;
 
-// $ java TestApp <peer_ap> <sub_protocol> <opnd_1> <opnd_2>
+// $ java TestApp <peer_access_point> <sub_protocol> <opnd_1> <opnd_2>
 
 public class TestApp {
 
     public static void main(String[] args) {
         // Obtain the Client Command
         if ((args.length < 2) || (args.length > 4)) {
-            System.out.println("java peer.TestApp <peer_ap> <sub_protocol> <opnd_1> <opnd_2>");
+            System.out.println("java peer.TestApp <peer_access_point> <sub_protocol> <opnd_1> <opnd_2>");
             return;
         }
         ClientCommand command = null;
@@ -20,6 +20,7 @@ public class TestApp {
             System.out.println("Args successfully parsed");
         }
         catch (IllegalArgumentException ex) {
+            System.out.println("Args couldn't be parsed");
             return;
         }
         if (command == null) {
@@ -28,7 +29,6 @@ public class TestApp {
             return;
         }
         command.execute();
-        // 
         System.out.println(Arrays.toString(args));
     }    
 }

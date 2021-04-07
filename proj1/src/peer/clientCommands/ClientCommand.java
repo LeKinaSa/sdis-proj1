@@ -6,14 +6,14 @@ import java.rmi.registry.Registry;
 import peer.ServerCommands;
 
 public abstract class ClientCommand {
-    public int accessPoint;
+    public String accessPoint;
     protected ServerCommands stub;
 
     ClientCommand(String[] args) {
-        this.accessPoint = Integer.parseInt(args[0]);
+        this.accessPoint = args[0];
         try {
-        Registry registry = LocateRegistry.getRegistry();
-        this.stub = (ServerCommands) registry.lookup(args[0]);
+            Registry registry = LocateRegistry.getRegistry();
+            this.stub = (ServerCommands) registry.lookup(this.accessPoint);
         }
         catch (Exception exception) {
             System.err.println("Client exception: " + exception.toString());
