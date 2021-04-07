@@ -17,7 +17,7 @@ public class ListenerThread extends Thread {
     }
 
     public void run() {
-        System.out.println("Thread listening to " + ip + ":" + port);
+        PeerDebugger.println("Thread listening to " + ip + ":" + port);
         
         // Open Socket
         MulticastSocket socket;
@@ -48,7 +48,7 @@ public class ListenerThread extends Thread {
             try {
                 socket.receive(p);
                 String message = new String(p.getData(), 0, p.getLength());
-                System.out.println("Message received: " + message);
+                PeerDebugger.println("Message received: " + message);
             }
             catch (IOException ignored) { }
         }

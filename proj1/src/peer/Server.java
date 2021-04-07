@@ -22,6 +22,7 @@ public class Server {
         int id;
         try {
             id = Integer.parseInt(args[1]);
+            PeerDebugger.setId(id);
         }
         catch (NumberFormatException exception) {
             System.out.println("<peer_id> is int");
@@ -46,7 +47,7 @@ public class Server {
         }
 
         // --------------- More services here ---------------
-        System.out.println("Starting services");
+        PeerDebugger.println("Starting services");
 
         // ----- Control channel service -----
         // Parse
@@ -55,7 +56,7 @@ public class Server {
         }
         obj.setMC(ip, port);
         // Open
-        System.out.println("Starting first thread");
+        PeerDebugger.println("Starting first thread");
         Thread mcThread = new ListenerThread(ip, port);
         mcThread.start();
         
@@ -80,7 +81,7 @@ public class Server {
         mdrThread.start();
 
         // --------------- Server is Ready ---------------
-        System.err.println("Server ready");
+        PeerDebugger.println("Server ready");
     }
 
     private static boolean getInformationFromArg(String arg) {
