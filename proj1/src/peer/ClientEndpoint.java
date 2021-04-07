@@ -73,7 +73,11 @@ public class ClientEndpoint implements ServerCommands { // Peer endpoint that th
 
     public void deleteFile(String fileName) {
         System.out.println("deleteFile()");
-        //TODO: implement
+
+        // Get message
+        byte[] message = this.messageMaker.deleteSender(fileName);
+        // Send message
+        this.sendMessage(ipMC, portMC, message);
     }
 
     public void reclaimSpace(int space) {
