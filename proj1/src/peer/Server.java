@@ -11,11 +11,8 @@ import java.rmi.server.UnicastRemoteObject;
         
 
 public class Server {
-    private static InetAddress ipMC, ipMDB, ipMDR;
-    private static int portMC, portMDB, portMDR;
-
-    private static InetAddress tempIp;
-    private static int tempPort;
+    private static InetAddress ip;
+    private static int port;
 
     public static void main(String[] args) {
         // Args: <protocol version> <peer id> <service access point> <MC> <MDB> <MDR>
@@ -44,8 +41,6 @@ public class Server {
             // Bind the remote object's stub in the registry
             Registry registry = LocateRegistry.getRegistry();
             registry.bind(accessPoint, stub);
-
-            System.err.println("Server ready");
         }
         catch (Exception exception) {
             System.err.println("Server exception: " + exception.toString());
@@ -53,42 +48,63 @@ public class Server {
             return;
         }
 
-        // More services here
+        // --------------- More services here ---------------
+        System.out.println("Starting services");
 
-        // Control channel service
-        getInformationFromArg(args[3]);
-        ipMC = tempIp;
-        portMC = tempPort;
-        obj.setMC(ipMC, portMC);
+        // ----- Control channel service -----
+        // Parse
+        if (!getInformationFromArg(args[3])) {
+            return;
+        }
+        obj.setMC(ip, port);
+        // Open
+        System.out.println("Starting first thread");
+        Thread mcThread = new ListenerThread(ip, port);
+        mcThread.start();
         
-        // Backup service
-        getInformationFromArg(args[4]);
-        ipMDB = tempIp;
-        portMDB = tempPort;
-        obj.setMDB(ipMDB, portMDB);
+        // ----- Backup service -----
+        // Parse
+        if (!getInformationFromArg(args[4])) {
+            return;
+        }
+        obj.setMDB(ip, port);
+        // Open
+        Thread mdbThread = new ListenerThread(ip, port);
+        mdbThread.start();
 
-        // Restore service
-        getInformationFromArg(args[5]);
-        ipMDR = tempIp;
-        portMDR = tempPort;
-        obj.setMDR(ipMDR, portMDR);
+        // ----- Restore service -----
+        // Parse
+        if (!getInformationFromArg(args[5])) {
+            return;
+        }
+        obj.setMDR(ip, port);
+        // Open
+        Thread mdrThread = new ListenerThread(ip, port);
+        mdrThread.start();
 
+        // --------------- Server is Ready ---------------
         System.err.println("Server ready");
     }
 
-    private static void getInformationFromArg(String arg) {
+    private static boolean getInformationFromArg(String arg) {
         String[] list = arg.split(":");
-        tempIp = null;
-        tempPort = -1;
+        if (list.length != 2) {
+            return false;
+        }
 
         try {
-            tempIp = InetAddress.getByName(list[0]);
+            ip = InetAddress.getByName(list[0]);
         }
-        catch (UnknownHostException ignored) { }
+        catch (UnknownHostException exception) {
+            return false;
+        }
         try {
-            tempPort = Integer.parseInt(list[1]);
+            port = Integer.parseInt(list[1]);
         }
-        catch (NumberFormatException ignored) { }
+        catch (NumberFormatException exception) {
+            return false;
+        }
+        return true;
     }
 
     public static boolean receiveMessage(InetAddress ip, int port) {
