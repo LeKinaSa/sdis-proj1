@@ -1,5 +1,7 @@
 package peer;
 
+import peer.messages.*;
+
 import java.io.IOException;
 import java.net.DatagramPacket;
 import java.net.InetAddress;
@@ -39,15 +41,15 @@ public class ListenerThread extends Thread {
         }
         
         // Read messages
-        // TODO: decypher the message and run the correct thing
         byte[] buf = new byte[MESSAGE_SIZE];
         DatagramPacket p = new DatagramPacket(buf, buf.length);
         int x = 1;
         while (x == 1) { // TODO: non infinite loop
             try {
                 socket.receive(p);
-                String message = new String(p.getData(), 0, p.getLength());
-                PeerDebugger.println("Message received: " + message);
+                Message message = Message.parse(p);
+                PeerDebugger.println("Message received: " + message.toString());
+                // TODO: run the correct thing based on the message type
             }
             catch (IOException ignored) { }
         }

@@ -1,5 +1,7 @@
 package peer.messages;
 
+import java.nio.charset.StandardCharsets;
+
 public class RestoreReceiverMessage extends Message {
     private String fileId;
     private int chunkNo;
@@ -21,5 +23,10 @@ public class RestoreReceiverMessage extends Message {
         byte[] buffer = generateMessageWithBody(message, this.chunkContent);
         // TODO: buffer might be null
         return buffer;
+    }
+
+    public String toString() {
+        String content = new String(chunkContent, StandardCharsets.UTF_8);
+        return "[peer" + this.peerId + "]" + this.version + " - Restore " + this.fileId + ":" + this.chunkNo + "::" + content;
     }
 }

@@ -18,4 +18,8 @@ public class DeleteSenderMessage extends Message {
         // TODO: buffer might be null
         return buffer;
     }
+
+    public String toString() {
+        return "[peer" + this.peerId + "]" + this.version + " - Delete " + this.fileId;
+    }
 }

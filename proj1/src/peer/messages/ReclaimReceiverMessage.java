@@ -20,4 +20,8 @@ public class ReclaimReceiverMessage extends Message {
         // TODO: buffer might be null
         return buffer;
     }
+
+    public String toString() {
+        return "[peer" + this.peerId + "]" + this.version + " - Reclaim " + this.fileId + ":" + this.chunkNo;
+    }
 }

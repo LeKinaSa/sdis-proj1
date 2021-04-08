@@ -10,7 +10,6 @@ public class RestoreSenderMessage extends Message {
         this.chunkNo = chunkNo;
     }
 
-
     @Override
     public byte[] assemble() {
         // Header: "<Version> GETCHUNK <SenderId> <FileId> <ChunkNo> "
@@ -21,5 +20,9 @@ public class RestoreSenderMessage extends Message {
         // TODO: buffer might be null
         return buffer;
 
+    }
+
+    public String toString() {
+        return "[peer" + this.peerId + "]" + this.version + " - Restore initiator " + this.fileId + ":" + this.chunkNo;
     }
 }

@@ -20,4 +20,8 @@ public class BackupReceiverMessage extends Message {
         // TODO: buffer might be null
         return buffer;
     }
+
+    public String toString() {
+        return "[peer" + this.peerId + "]" + this.version + " - Backup " + this.fileId + ":" + this.chunkNo;
+    }
 }
