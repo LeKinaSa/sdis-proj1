@@ -14,7 +14,7 @@ public class TestApp {
             System.out.println("java peer.TestApp <peer_access_point> <sub_protocol> <opnd_1> <opnd_2>");
             return;
         }
-        ClientCommand command = null;
+        ClientCommand command;
         try {
             command = ClientCommand.parseArgs(args);
             System.out.println("Args successfully parsed");

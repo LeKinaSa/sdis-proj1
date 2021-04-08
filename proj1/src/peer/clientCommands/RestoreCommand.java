@@ -1,7 +1,7 @@
 package peer.clientCommands;
 
 public class RestoreCommand extends ClientCommand {
-    private String file;
+    private final String file;
 
     public RestoreCommand(String[] args) {
         super(args);

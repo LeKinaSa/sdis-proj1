@@ -8,6 +8,6 @@ public class PeerDebugger {
     }
 
     public static synchronized void println(String x) {
-        System.out.println("[peer" + Integer.toString(id) + "] " + x);
+        System.out.println("[peer" + id + "] " + x);
     }
 }

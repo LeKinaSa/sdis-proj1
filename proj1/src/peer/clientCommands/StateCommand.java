@@ -2,7 +2,7 @@ package peer.clientCommands;
 
 public class StateCommand extends ClientCommand {
 
-    public StateCommand(String args[]) {
+    public StateCommand(String[] args) {
         super(args);
         assert (args[1].equals("STATE"));
 

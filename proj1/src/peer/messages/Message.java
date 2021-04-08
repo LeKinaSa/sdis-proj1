@@ -118,6 +118,8 @@ public abstract class Message {
                     }
                     return new ReclaimReceiverMessage(version, senderId, fileId, chunkNo);
                 }
+                default:
+                    return null;
             }
         }
         return null;

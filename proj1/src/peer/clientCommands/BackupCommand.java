@@ -3,8 +3,8 @@ package peer.clientCommands;
 import java.io.*;
 
 public class BackupCommand extends ClientCommand {
-    public String fileName;
-    public int replicationFactor;
+    public final String fileName;
+    public final int replicationFactor;
 
     public BackupCommand(String[] args) {
         super(args);
@@ -23,7 +23,7 @@ public class BackupCommand extends ClientCommand {
         System.out.println("Executing backup...");
         try {
             File file = new File(this.fileName);
-            FileInputStream in = null;
+            FileInputStream in;
             try {
                 in = new FileInputStream(file);
             }
@@ -34,21 +34,22 @@ public class BackupCommand extends ClientCommand {
 
             int fileSize = (int) file.length();
             byte[] buffer = new byte[fileSize];
-            int readSize;
             try {
-                readSize = in.read(buffer);
+                in.read(buffer);
                 stub.backupFile(this.fileName, buffer, this.replicationFactor);
             }
             catch (IOException exception) {
-                // TODO
+                System.err.println("Client exception: " + exception.toString());
+                exception.printStackTrace();
             }
             try {
                 in.close();
             }
-            catch (IOException exception) { }
-        } catch (Exception e) {
-            System.err.println("Client exception: " + e.toString());
-            e.printStackTrace();
+            catch (IOException ignored) { }
+        }
+        catch (Exception exception) {
+            System.err.println("Client exception: " + exception.toString());
+            exception.printStackTrace();
         }
     }
 }
