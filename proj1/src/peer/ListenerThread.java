@@ -9,10 +9,10 @@ import java.net.MulticastSocket;
 
 public class ListenerThread extends Thread {
     private static final int MESSAGE_SIZE = 65000;
-    // This size tries to garantee that the full message will be read from the socket
+    // This size tries to guarantee that the full message will be read from the socket
 
-    private InetAddress ip;
-    private int port;
+    private final InetAddress ip;
+    private final int port;
     
     public ListenerThread(InetAddress ip, int port) {
         this.ip = ip;
@@ -28,7 +28,7 @@ public class ListenerThread extends Thread {
             socket = new MulticastSocket(port);
         }
         catch (IOException exception) {
-            PeerDebugger.println("Error ocurred");
+            PeerDebugger.println("Error occurred");
             return;
         }
         try {
@@ -45,13 +45,24 @@ public class ListenerThread extends Thread {
         DatagramPacket p = new DatagramPacket(buf, buf.length);
         int x = 1;
         while (x == 1) { // TODO: non infinite loop
+            // Obtain Packet
             try {
                 socket.receive(p);
-                Message message = Message.parse(p);
-                PeerDebugger.println("Message received: " + message.toString());
-                // TODO: run the correct thing based on the message type
             }
-            catch (IOException ignored) { }
+            catch (IOException exception) {
+                continue;
+            }
+
+            // Obtain Message contained in Received Packet
+            Message message = Message.parse(p);
+            if (message == null) {
+                String errorMessage = new String(p.getData(), 0, p.getLength());
+                PeerDebugger.println("Message received with error: " + errorMessage);
+                continue;
+            }
+            PeerDebugger.println("Message received: " + message.toString());
+            
+            // TODO: run the correct thing based on the message type
         }
 
         // Close Socket
