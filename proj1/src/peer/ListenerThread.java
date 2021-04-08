@@ -1,12 +1,15 @@
 package peer;
 
+import peer.messages.*;
+
 import java.io.IOException;
 import java.net.DatagramPacket;
 import java.net.InetAddress;
 import java.net.MulticastSocket;
 
 public class ListenerThread extends Thread {
-    private static final int MESSAGE_SIZE = 60;
+    private static final int MESSAGE_SIZE = 65000;
+    // This size tries to garantee that the full message will be read from the socket
 
     private InetAddress ip;
     private int port;
@@ -25,30 +28,28 @@ public class ListenerThread extends Thread {
             socket = new MulticastSocket(port);
         }
         catch (IOException exception) {
-            System.out.println("Error ocurred");
+            PeerDebugger.println("Error ocurred");
             return;
         }
         try {
             socket.joinGroup(ip);
         }
         catch (IOException exception) {
-            System.out.println("Error occurred: " + exception.getMessage());
+            PeerDebugger.println("Error occurred: " + exception.getMessage());
             socket.close();
             return;
         }
         
         // Read messages
-        // TODO: define message size
-        // TODO: define message
-        // TODO: decypher the message and run the correct thing
         byte[] buf = new byte[MESSAGE_SIZE];
         DatagramPacket p = new DatagramPacket(buf, buf.length);
         int x = 1;
         while (x == 1) { // TODO: non infinite loop
             try {
                 socket.receive(p);
-                String message = new String(p.getData(), 0, p.getLength());
-                PeerDebugger.println("Message received: " + message);
+                Message message = Message.parse(p);
+                PeerDebugger.println("Message received: " + message.toString());
+                // TODO: run the correct thing based on the message type
             }
             catch (IOException ignored) { }
         }
