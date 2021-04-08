@@ -3,10 +3,10 @@ package peer.messages;
 import java.nio.charset.StandardCharsets;
 
 public class BackupSenderMessage extends Message {
-    private String fileId;
-    private int chunkNo;
-    private int replicationDegree;
-    private byte[] chunkContent;
+    private final String fileId;
+    private final int chunkNo;
+    private final int replicationDegree;
+    private final byte[] chunkContent;
 
     public BackupSenderMessage(String version, int peerId, String fileId, int chunkNo, int replicationDegree, byte[] chunkContent) {
         super(version, peerId);
@@ -22,13 +22,11 @@ public class BackupSenderMessage extends Message {
         String message = this.version + " PUTCHUNK " + this.peerId + " " + this.fileId + " " + this.chunkNo + " " + this.replicationDegree + " ";
 
         // Get Message Bytes (Header + Body)
-        byte[] buffer = generateMessageWithBody(message, this.chunkContent);
-        // TODO: buffer might be null
-        return buffer;
+        return generateMessageWithBody(message, this.chunkContent);
     }
 
     public String toString() {
         String content = new String(chunkContent, StandardCharsets.UTF_8);
-        return "[peer" + this.peerId + "]" + this.version + " - Backup initiator " + this.fileId + ":" + this.chunkNo + " x" + replicationDegree + "::" + content;
+        return "[peer" + this.peerId + "] v" + this.version + " - Backup initiator " + this.fileId + ":" + this.chunkNo + " x" + replicationDegree + "::" + content;
     }
 }

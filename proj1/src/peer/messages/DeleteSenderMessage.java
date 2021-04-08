@@ -1,7 +1,7 @@
 package peer.messages;
 
 public class DeleteSenderMessage extends Message {
-    private String fileId;
+    private final String fileId;
 
     public DeleteSenderMessage(String version, int peerId, String fileId) {
         super(version, peerId);
@@ -14,12 +14,10 @@ public class DeleteSenderMessage extends Message {
         String message = this.version + " DELETE " + this.peerId + " " + this.fileId + " ";
 
         // Get Message Bytes (Header)
-        byte[] buffer = generateMessageWithoutBody(message);
-        // TODO: buffer might be null
-        return buffer;
+        return generateMessageWithoutBody(message);
     }
 
     public String toString() {
-        return "[peer" + this.peerId + "]" + this.version + " - Delete " + this.fileId;
+        return "[peer" + this.peerId + "] v" + this.version + " - Delete " + this.fileId;
     }
 }

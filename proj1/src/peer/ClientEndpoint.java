@@ -10,11 +10,11 @@ import java.net.SocketException;
 import java.util.Arrays;
 
 public class ClientEndpoint implements ServerCommands { // Peer endpoint that the client reaches out
-    private static final int CHUNK_SIZE = 64000;
-    private static InetAddress ipMC, ipMDB, ipMDR;
-    private static int portMC, portMDB, portMDR;
-    private String version;
-    private int peerId;
+    private final int CHUNK_SIZE = 64000;
+    private InetAddress ipMC, ipMDB, ipMDR;
+    private int portMC, portMDB, portMDR;
+    private final String version;
+    private final int peerId;
 
     public ClientEndpoint(String version, int id) {
         this.version = version;
@@ -97,22 +97,19 @@ public class ClientEndpoint implements ServerCommands { // Peer endpoint that th
         return "hello";
     }
 
-    private boolean sendMessage(InetAddress ip, int port, byte[] buf) {
+    private void sendMessage(InetAddress ip, int port, byte[] buf) {
         DatagramSocket socket;
         try {
             socket = new DatagramSocket();
         }
         catch (SocketException exception) {
-            return false;
+            return;
         }
         DatagramPacket packet = new DatagramPacket(buf, buf.length, ip, port);
         try {
             socket.send(packet);
         }
-        catch (IOException exception) {
-            return false;
-        }
+        catch (IOException ignored) { }
         socket.close();
-        return true;
     }
 }

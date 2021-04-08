@@ -1,8 +1,8 @@
 package peer.messages;
 
 public class BackupReceiverMessage extends Message {
-    private String fileId;
-    private int chunkNo;
+    private final String fileId;
+    private final int chunkNo;
 
     public BackupReceiverMessage(String version, int peerId, String fileId, int chunkNo) {
         super(version, peerId);
@@ -16,12 +16,10 @@ public class BackupReceiverMessage extends Message {
         String message = this.version + " STORED " + this.peerId + " " + this.fileId + " " + this.chunkNo + " ";
 
         // Get Message Bytes (Header)
-        byte[] buffer = generateMessageWithoutBody(message);
-        // TODO: buffer might be null
-        return buffer;
+        return generateMessageWithoutBody(message);
     }
 
     public String toString() {
-        return "[peer" + this.peerId + "]" + this.version + " - Backup " + this.fileId + ":" + this.chunkNo;
+        return "[peer" + this.peerId + "] v" + this.version + " - Backup " + this.fileId + ":" + this.chunkNo;
     }
 }

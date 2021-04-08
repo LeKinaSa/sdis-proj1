@@ -1,8 +1,8 @@
 package peer.messages;
 
 public class RestoreSenderMessage extends Message {
-    private String fileId;
-    private int chunkNo;
+    private final String fileId;
+    private final int chunkNo;
 
     public RestoreSenderMessage(String version, int peerId, String fileId, int chunkNo) {
         super(version, peerId);
@@ -16,13 +16,10 @@ public class RestoreSenderMessage extends Message {
         String message = this.version + " GETCHUNK " + this.peerId + " " + this.fileId + " " + this.chunkNo + " ";
 
         // Get Message Bytes (Header)
-        byte[] buffer = generateMessageWithoutBody(message);
-        // TODO: buffer might be null
-        return buffer;
-
+        return generateMessageWithoutBody(message);
     }
 
     public String toString() {
-        return "[peer" + this.peerId + "]" + this.version + " - Restore initiator " + this.fileId + ":" + this.chunkNo;
+        return "[peer" + this.peerId + "] v" + this.version + " - Restore initiator " + this.fileId + ":" + this.chunkNo;
     }
 }
