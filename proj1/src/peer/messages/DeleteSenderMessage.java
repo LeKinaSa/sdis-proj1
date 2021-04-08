@@ -8,6 +8,10 @@ public class DeleteSenderMessage extends Message {
         this.fileId = fileId;
     }
 
+    public String toString() {
+        return "[peer" + this.peerId + "] v" + this.version + " - Delete " + this.fileId;
+    }
+
     @Override
     public byte[] assemble() {
         // Header: "<Version> DELETE <SenderId> <FileId> "
@@ -17,7 +21,8 @@ public class DeleteSenderMessage extends Message {
         return generateMessageWithoutBody(message);
     }
 
-    public String toString() {
-        return "[peer" + this.peerId + "] v" + this.version + " - Delete " + this.fileId;
+    @Override
+    public void answer() {
+        // TODO
     }
 }

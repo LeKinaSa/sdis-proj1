@@ -10,6 +10,10 @@ public class ReclaimReceiverMessage extends Message {
         this.chunkNo = chunkNo;
     }
 
+    public String toString() {
+        return "[peer" + this.peerId + "] v" + this.version + " - Reclaim " + this.fileId + ":" + this.chunkNo;
+    }
+
     @Override
     public byte[] assemble() {
         // Header: "<Version> REMOVED <SenderId> <FileId> <ChunkNo> "
@@ -19,7 +23,8 @@ public class ReclaimReceiverMessage extends Message {
         return generateMessageWithoutBody(message);
     }
 
-    public String toString() {
-        return "[peer" + this.peerId + "] v" + this.version + " - Reclaim " + this.fileId + ":" + this.chunkNo;
+    @Override
+    public void answer() {
+        // TODO
     }
 }

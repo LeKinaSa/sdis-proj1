@@ -14,6 +14,11 @@ public class RestoreReceiverMessage extends Message {
         this.chunkContent = chunkContent;
     }
 
+    public String toString() {
+        String content = new String(chunkContent, StandardCharsets.UTF_8);
+        return "[peer" + this.peerId + "] v" + this.version + " - Restore " + this.fileId + ":" + this.chunkNo + "::" + content;
+    }
+
     @Override
     public byte[] assemble() {
         // Header: "<Version> CHUNK <SenderId> <FileId> <ChunkNo> "
@@ -23,8 +28,8 @@ public class RestoreReceiverMessage extends Message {
         return generateMessageWithBody(message, this.chunkContent);
     }
 
-    public String toString() {
-        String content = new String(chunkContent, StandardCharsets.UTF_8);
-        return "[peer" + this.peerId + "] v" + this.version + " - Restore " + this.fileId + ":" + this.chunkNo + "::" + content;
+    @Override
+    public void answer() {
+        // TODO
     }
 }

@@ -16,6 +16,11 @@ public class BackupSenderMessage extends Message {
         this.chunkContent = chunkContent;
     }
 
+    public String toString() {
+        String content = new String(chunkContent, StandardCharsets.UTF_8);
+        return "[peer" + this.peerId + "] v" + this.version + " - Backup initiator " + this.fileId + ":" + this.chunkNo + " x" + replicationDegree + "::" + content;
+    }
+
     @Override
     public byte[] assemble() {
         // Header: "<Version> PUTCHUNK <SenderId> <FileId> <ChunkNo> <ReplicationDegree> "
@@ -25,8 +30,8 @@ public class BackupSenderMessage extends Message {
         return generateMessageWithBody(message, this.chunkContent);
     }
 
-    public String toString() {
-        String content = new String(chunkContent, StandardCharsets.UTF_8);
-        return "[peer" + this.peerId + "] v" + this.version + " - Backup initiator " + this.fileId + ":" + this.chunkNo + " x" + replicationDegree + "::" + content;
+    @Override
+    public void answer() {
+        // TODO
     }
 }

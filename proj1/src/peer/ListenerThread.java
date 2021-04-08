@@ -1,6 +1,6 @@
 package peer;
 
-import peer.messages.*;
+import peer.messages.Message;
 
 import java.io.IOException;
 import java.net.DatagramPacket;
@@ -60,9 +60,10 @@ public class ListenerThread extends Thread {
                 PeerDebugger.println("Message received with error: " + errorMessage);
                 continue;
             }
+
+            // Execute the Necessary Action based on the Received Message
             PeerDebugger.println("Message received: " + message.toString());
-            
-            // TODO: run the correct thing based on the message type
+            message.answer();
         }
 
         // Close Socket

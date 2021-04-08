@@ -45,8 +45,6 @@ public abstract class Message {
         return aux.toByteArray();
     }
 
-    public abstract byte[] assemble();
-
     public static Message parse(DatagramPacket packet) {
         String message = new String(packet.getData(), 0, packet.getLength());
         Matcher matcher = MESSAGE_PATTERN.matcher(message);
@@ -124,4 +122,8 @@ public abstract class Message {
         }
         return null;
     }
+
+    public abstract byte[] assemble();
+
+    public abstract void answer();
 }
