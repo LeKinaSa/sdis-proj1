@@ -57,7 +57,7 @@ public class Server {
         obj.setMC(ip, port);
         // Open
         PeerDebugger.println("Starting first thread");
-        Thread mcThread = new ListenerThread(ip, port);
+        Thread mcThread = new ListenerThread(id, ip, port);
         mcThread.start();
         
         // ----- Backup service -----
@@ -67,7 +67,7 @@ public class Server {
         }
         obj.setMDB(ip, port);
         // Open
-        Thread mdbThread = new ListenerThread(ip, port);
+        Thread mdbThread = new ListenerThread(id, ip, port);
         mdbThread.start();
 
         // ----- Restore service -----
@@ -77,7 +77,7 @@ public class Server {
         }
         obj.setMDR(ip, port);
         // Open
-        Thread mdrThread = new ListenerThread(ip, port);
+        Thread mdrThread = new ListenerThread(id, ip, port);
         mdrThread.start();
 
         // --------------- Server is Ready ---------------

@@ -31,7 +31,15 @@ public class BackupSenderMessage extends Message {
     }
 
     @Override
-    public void answer() {
+    public byte[] answer(int id) {
+        if (this.peerId == id) {
+            return null;
+        }
+
         // TODO
+        // Backup chunk to his own file system
+        // Delay 0,400 ms
+        // Send Message: BackupReceiverMessage(toMC channel)
+        return null;
     }
 }

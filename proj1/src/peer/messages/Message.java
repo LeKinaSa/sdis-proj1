@@ -127,5 +127,5 @@ public abstract class Message {
 
     public abstract byte[] assemble();
 
-    public abstract void answer();
+    public abstract byte[] answer(int id);
 }

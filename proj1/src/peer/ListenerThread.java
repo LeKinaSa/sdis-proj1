@@ -11,10 +11,12 @@ public class ListenerThread extends Thread {
     private static final int MESSAGE_SIZE = 65000;
     // This size tries to guarantee that the full message will be read from the socket
 
+    private int id;
     private final InetAddress ip;
     private final int port;
     
-    public ListenerThread(InetAddress ip, int port) {
+    public ListenerThread(int id, InetAddress ip, int port) {
+        this.id = id;
         this.ip = ip;
         this.port = port;
     }
@@ -63,7 +65,7 @@ public class ListenerThread extends Thread {
 
             // Execute the Necessary Action based on the Received Message
             PeerDebugger.println("Message received: " + message.toString());
-            message.answer();
+            message.answer(this.id);
         }
 
         // Close Socket

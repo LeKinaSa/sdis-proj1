@@ -22,7 +22,8 @@ public class DeleteSenderMessage extends Message {
     }
 
     @Override
-    public void answer() {
+    public byte[] answer(int id) {
         // TODO
+        return null;
     }
 }
