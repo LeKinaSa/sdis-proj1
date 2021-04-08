@@ -1,5 +1,7 @@
 package peer;
 
+import peer.messages.*;
+
 import java.io.IOException;
 import java.net.DatagramPacket;
 import java.net.DatagramSocket;
@@ -9,12 +11,14 @@ import java.util.Arrays;
 
 public class ClientEndpoint implements ServerCommands { // Peer endpoint that the client reaches out
     private static final int CHUNK_SIZE = 64000;
-    private MessageMaker messageMaker;
     private static InetAddress ipMC, ipMDB, ipMDR;
     private static int portMC, portMDB, portMDR;
+    private String version;
+    private int peerId;
 
     public ClientEndpoint(String version, int id) {
-        this.messageMaker = new MessageMaker(version, id);
+        this.version = version;
+        this.peerId = id;
     }
 
     public void setMC(InetAddress ip, int port) {
@@ -60,7 +64,8 @@ public class ClientEndpoint implements ServerCommands { // Peer endpoint that th
         System.out.println("backup chunk with size:" + chunkContent.length);
 
         // Get Message
-        byte[] message = this.messageMaker.backupSender(fileId, chunkNo, replicationDegree, chunkContent);
+        Message messageMaker = new BackupSenderMessage(this.version, this.peerId, fileId, chunkNo, replicationDegree, chunkContent);
+        byte[] message = messageMaker.assemble();
         // Send Message
         this.sendMessage(ipMDB, portMDB, message);
     }
@@ -75,7 +80,8 @@ public class ClientEndpoint implements ServerCommands { // Peer endpoint that th
         System.out.println("deleteFile()");
 
         // Get message
-        byte[] message = this.messageMaker.deleteSender(fileName);
+        Message messageMaker = new DeleteSenderMessage(this.version, this.peerId, fileName);
+        byte[] message = messageMaker.assemble();
         // Send message
         this.sendMessage(ipMC, portMC, message);
     }
