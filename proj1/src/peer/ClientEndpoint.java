@@ -37,7 +37,7 @@ public class ClientEndpoint implements ServerCommands { // Peer endpoint that th
     }
 
     public void backupFile(String fileName, byte[] fileContents, int replicationDegree) {
-        System.out.println("backupFile()");
+        PeerDebugger.println("backupFile()");
 
         int fileSize = fileContents.length;
         int backedUp = 0;
@@ -61,7 +61,7 @@ public class ClientEndpoint implements ServerCommands { // Peer endpoint that th
     }
 
     private void backupChunk(byte[] chunkContent, int replicationDegree, String fileId, int chunkNo) {
-        System.out.println("backup chunk with size:" + chunkContent.length);
+        PeerDebugger.println("backup chunk with size:" + chunkContent.length);
 
         // Get Message
         Message messageMaker = new BackupSenderMessage(this.version, this.peerId, fileId, chunkNo, replicationDegree, chunkContent);
@@ -71,13 +71,13 @@ public class ClientEndpoint implements ServerCommands { // Peer endpoint that th
     }
 
     public byte[] restoreFile(String fileName) {
-        System.out.println("restoreFile()");
+        PeerDebugger.println("restoreFile()");
         //TODO: implement
         return new byte[0];
     }
 
     public void deleteFile(String fileName) {
-        System.out.println("deleteFile()");
+        PeerDebugger.println("deleteFile()");
 
         // Get message
         Message messageMaker = new DeleteSenderMessage(this.version, this.peerId, fileName);
@@ -87,12 +87,12 @@ public class ClientEndpoint implements ServerCommands { // Peer endpoint that th
     }
 
     public void reclaimSpace(int space) {
-        System.out.println("reclaimSpace()");
+        PeerDebugger.println("reclaimSpace()");
         //TODO: implement
     }
 
     public String state() {
-        System.out.println("state()");
+        PeerDebugger.println("state()");
         //TODO: implement
         return "hello";
     }
