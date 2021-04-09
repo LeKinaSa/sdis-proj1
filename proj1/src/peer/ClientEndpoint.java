@@ -92,7 +92,7 @@ public class ClientEndpoint implements ServerCommands { // Peer endpoint that th
                 try {
                     socket.receive(p); // TODO: should this be non blocking ? so it doesnt get stuck here forever
                     Message answer = Message.parse(mc, mdb, mdr, p);
-                    if (answer instanceof BackupReceiverMessage) {
+                    if ((answer instanceof BackupReceiverMessage) && (((BackupReceiverMessage) answer).correspondsTo(fileId, chunkNo))) {
                         answers ++;
                     }
                 }

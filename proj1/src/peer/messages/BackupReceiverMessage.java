@@ -31,4 +31,8 @@ public class BackupReceiverMessage extends Message {
         // TODO
         return null;
     }
+
+    public boolean correspondsTo(String fileId, int chunkNo) {
+        return this.fileId.equals(fileId) && (this.chunkNo == chunkNo);
+    }
 }
