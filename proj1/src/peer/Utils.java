@@ -3,6 +3,7 @@ package peer;
 import peer.messages.Message;
 
 import java.io.File;
+import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.net.DatagramPacket;
@@ -83,7 +84,7 @@ public class Utils {
         if (fileReady) {
             // File has been created successfully
             try {
-                // Store information inside the folder
+                // Store information inside the file
                 FileOutputStream stream = new FileOutputStream("../peer-data/" + id + "/" + fileId + "/" + chunkNo);
                 stream.write(chunkContent);
                 stream.close();
@@ -95,6 +96,23 @@ public class Utils {
         // If information wasn't stored, make sure there is no file
         file.delete();
         return false;
+    }
+
+    public static byte[] load(int id, String fileId, int chunkNo) {
+        File file = new File("../peer-data/" + id + "/" + fileId + "/" + chunkNo);
+        if (file.exists()) {
+            // File was found
+            byte[] buf = new byte[Message.CHUNK_SIZE];
+            try {
+                // Load information from inside the file
+                FileInputStream stream = new FileInputStream("../peer-data/" + id + "/" + fileId + "/" + chunkNo);
+                stream.read(buf);
+                stream.close();
+                return buf;
+            }
+            catch (IOException ignored) { }
+        }
+        return null;
     }
 
     public static void deleteFile(int id, String fileId) {

@@ -9,7 +9,6 @@ import java.net.MulticastSocket;
 import java.util.Arrays;
 
 public class ClientEndpoint implements ServerCommands { // Peer endpoint that the client reaches out
-    private final int CHUNK_SIZE = 64000;
     private final int REPETITIONS = 5;
     private Channel mc, mdb, mdr;
     private final String version;
@@ -37,7 +36,7 @@ public class ClientEndpoint implements ServerCommands { // Peer endpoint that th
         int chunk = 0;
 
         while (backedUp < fileSize) {
-            toBackUp = Math.min(CHUNK_SIZE, fileSize - backedUp);
+            toBackUp = Math.min(Message.CHUNK_SIZE, fileSize - backedUp);
 
             // Backup Chunk [backedUp, backedUp + toBackUp[
             backupChunk(Arrays.copyOfRange(fileContents, backedUp, backedUp + toBackUp), replicationDegree, fileName, chunk);
@@ -46,7 +45,7 @@ public class ClientEndpoint implements ServerCommands { // Peer endpoint that th
         }
 
         // File size is a multiple of the chunk size
-        if (fileSize % CHUNK_SIZE == 0) {
+        if (fileSize % Message.CHUNK_SIZE == 0) {
             // Backup Chunk with size 0
             backupChunk(new byte[0], replicationDegree, fileName, chunk);
         }
@@ -90,7 +89,8 @@ public class ClientEndpoint implements ServerCommands { // Peer endpoint that th
             answers = 0;
             while (current_timestamp < initial_timestamp + timeInterval) {
                 try {
-                    socket.receive(p); // TODO: should this be non blocking ? so it doesnt get stuck here forever
+                    socket.setSoTimeout((int) (initial_timestamp + timeInterval - current_timestamp));
+                    socket.receive(p);
                     Message answer = Message.parse(mc, mdb, mdr, p);
                     if ((answer instanceof BackupReceiverMessage) && (((BackupReceiverMessage) answer).correspondsTo(fileId, chunkNo))) {
                         answers ++;
@@ -114,7 +114,7 @@ public class ClientEndpoint implements ServerCommands { // Peer endpoint that th
     }
 
     public byte[] restoreFile(String fileName) {
-        // TODO: introduce timeout? so it doesnt get stuck here forever
+        // TODO: introduce timeout? so it doesn't get stuck here forever
         PeerDebugger.println("restoreFile()");
 
         // aux will be holding the file data
@@ -139,10 +139,10 @@ public class ClientEndpoint implements ServerCommands { // Peer endpoint that th
         }
 
         int chunk = 0;
-        int chunkSize = CHUNK_SIZE;
+        int chunkSize = Message.CHUNK_SIZE;
         byte[] buf = new byte[Message.MESSAGE_SIZE];
         DatagramPacket p = new DatagramPacket(buf, buf.length);
-        while (chunkSize < CHUNK_SIZE) {
+        while (chunkSize >= Message.CHUNK_SIZE) {
             // Get message
             Message message = new RestoreSenderMessage(this.mc, this.mdb, this.mdr, this.version, this.peerId, fileName, chunk);
             // Send message

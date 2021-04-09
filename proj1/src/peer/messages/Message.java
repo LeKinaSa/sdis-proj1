@@ -13,6 +13,7 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 public abstract class Message {
+    public static final int CHUNK_SIZE = 64000;
     public static final int MESSAGE_SIZE = 65000;
     // This size tries to guarantee that the full message will be read from the socket
 
