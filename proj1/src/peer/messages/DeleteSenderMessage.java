@@ -12,13 +12,13 @@ public class DeleteSenderMessage extends Message {
     }
 
     public String toString() {
-        return "[peer" + this.peerId + "] v" + this.version + " - Delete " + this.fileId;
+        return "[peer" + this.messagePeerId + "] v" + this.version + " - Delete " + this.fileId;
     }
 
     @Override
     public byte[] assemble() {
         // Header: "<Version> DELETE <SenderId> <FileId> "
-        String message = this.version + " DELETE " + this.peerId + " " + this.fileId + " ";
+        String message = this.version + " DELETE " + this.messagePeerId + " " + this.fileId + " ";
 
         // Get Message Bytes (Header)
         return generateMessageWithoutBody(message);

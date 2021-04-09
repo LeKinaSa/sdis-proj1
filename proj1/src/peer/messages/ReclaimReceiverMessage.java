@@ -14,13 +14,13 @@ public class ReclaimReceiverMessage extends Message {
     }
 
     public String toString() {
-        return "[peer" + this.peerId + "] v" + this.version + " - Reclaim " + this.fileId + ":" + this.chunkNo;
+        return "[peer" + this.messagePeerId + "] v" + this.version + " - Reclaim " + this.fileId + ":" + this.chunkNo;
     }
 
     @Override
     public byte[] assemble() {
         // Header: "<Version> REMOVED <SenderId> <FileId> <ChunkNo> "
-        String message = this.version + " REMOVED " + this.peerId + " " + this.fileId + " " + this.chunkNo + " ";
+        String message = this.version + " REMOVED " + this.messagePeerId + " " + this.fileId + " " + this.chunkNo + " ";
 
         // Get Message Bytes (Header)
         return generateMessageWithoutBody(message);

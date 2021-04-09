@@ -14,13 +14,13 @@ public class BackupReceiverMessage extends Message {
     }
 
     public String toString() {
-        return "[peer" + this.peerId + "] v" + this.version + " - Backup " + this.fileId + ":" + this.chunkNo;
+        return "[peer" + this.messagePeerId + "] v" + this.version + " - Backup " + this.fileId + ":" + this.chunkNo;
     }
 
     @Override
     public byte[] assemble() {
         // Header: "<Version> STORED <SenderId> <FileId> <ChunkNo> "
-        String message = this.version + " STORED " + this.peerId + " " + this.fileId + " " + this.chunkNo + " ";
+        String message = this.version + " STORED " + this.messagePeerId + " " + this.fileId + " " + this.chunkNo + " ";
 
         // Get Message Bytes (Header)
         return generateMessageWithoutBody(message);

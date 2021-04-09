@@ -19,13 +19,13 @@ public class RestoreReceiverMessage extends Message {
 
     public String toString() {
         String content = new String(chunkContent, StandardCharsets.UTF_8);
-        return "[peer" + this.peerId + "] v" + this.version + " - Restore " + this.fileId + ":" + this.chunkNo + "::" + content;
+        return "[peer" + this.messagePeerId + "] v" + this.version + " - Restore " + this.fileId + ":" + this.chunkNo + "::" + content;
     }
 
     @Override
     public byte[] assemble() {
         // Header: "<Version> CHUNK <SenderId> <FileId> <ChunkNo> "
-        String message = this.version + " CHUNK " + this.peerId + " " + this.fileId + " " + this.chunkNo + " ";
+        String message = this.version + " CHUNK " + this.messagePeerId + " " + this.fileId + " " + this.chunkNo + " ";
 
         // Get Message Bytes (Header + Body)
         return generateMessageWithBody(message, this.chunkContent);

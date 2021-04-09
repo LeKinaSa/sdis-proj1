@@ -17,15 +17,15 @@ public abstract class Message {
     private final ChannelName channel;
     protected final Channel mc, mdb, mdr;
     protected final String version;
-    protected final int peerId;
+    protected final int messagePeerId;
 
-    public Message(ChannelName channelName, Channel mc, Channel mdb, Channel mdr, String version, int peerId) {
+    public Message(ChannelName channelName, Channel mc, Channel mdb, Channel mdr, String version, int messagePeerId) {
         this.channel = channelName;
         this.mc = mc;
         this.mdb = mdb;
         this.mdr = mdr;
         this.version = version;
-        this.peerId = peerId;
+        this.messagePeerId = messagePeerId;
     }
 
     protected byte[] generateMessageWithBody(String header, byte[] body) {

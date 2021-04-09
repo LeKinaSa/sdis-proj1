@@ -14,13 +14,13 @@ public class RestoreSenderMessage extends Message {
     }
 
     public String toString() {
-        return "[peer" + this.peerId + "] v" + this.version + " - Restore initiator " + this.fileId + ":" + this.chunkNo;
+        return "[peer" + this.messagePeerId + "] v" + this.version + " - Restore initiator " + this.fileId + ":" + this.chunkNo;
     }
 
     @Override
     public byte[] assemble() {
         // Header: "<Version> GETCHUNK <SenderId> <FileId> <ChunkNo> "
-        String message = this.version + " GETCHUNK " + this.peerId + " " + this.fileId + " " + this.chunkNo + " ";
+        String message = this.version + " GETCHUNK " + this.messagePeerId + " " + this.fileId + " " + this.chunkNo + " ";
 
         // Get Message Bytes (Header)
         return generateMessageWithoutBody(message);
