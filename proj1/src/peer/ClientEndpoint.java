@@ -1,6 +1,7 @@
 package peer;
 
 import peer.messages.*;
+import peer.state.PeerState;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
@@ -197,7 +198,6 @@ public class ClientEndpoint implements ServerCommands { // Peer endpoint that th
 
     public String state() {
         PeerDebugger.println("state()");
-        //TODO: implement
-        return "hello";
+        return PeerState.INSTANCE.toString();
     }
 }
