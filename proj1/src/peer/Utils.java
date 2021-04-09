@@ -34,6 +34,10 @@ public class Utils {
         // TODO
     }
 
+    public static void deleteFile(int id, String fileId) {
+        // TODO
+    }
+
     public static void sendMessage(Message message) {
         InetAddress ip = message.getIp();
         int port = message.getPort();

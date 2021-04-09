@@ -42,9 +42,9 @@ public class BackupSenderMessage extends Message {
 
         // New Thread to deal with the answer
         Thread thread = new Thread(() -> {
-            if (!Utils.fileExists(this.messagePeerId, this.fileId, this.chunkNo)) {
+            if (!Utils.fileExists(id, this.fileId, this.chunkNo)) {
                 // Store the chunk (if the chunk isn't already stored in this peer)
-                Utils.store(this.messagePeerId, this.fileId, this.chunkNo, this.chunkContent);
+                Utils.store(id, this.fileId, this.chunkNo, this.chunkContent);
             }
             // Delay from [0, 400[ ms
             Utils.pause(Utils.getRandomNumber(0, 401));

@@ -6,6 +6,7 @@ import java.util.Arrays;
 
 public class ClientEndpoint implements ServerCommands { // Peer endpoint that the client reaches out
     private final int CHUNK_SIZE = 64000;
+    private final int REPETITIONS = 5;
     private Channel mc, mdb, mdr;
     private final String version;
     private final int peerId;
@@ -48,15 +49,13 @@ public class ClientEndpoint implements ServerCommands { // Peer endpoint that th
     private void backupChunk(byte[] chunkContent, int replicationDegree, String fileId, int chunkNo) {
         PeerDebugger.println("backup chunk with size:" + chunkContent.length);
 
-        final int REPETITIONS = 5;
-
         // Get Message
         Message message = new BackupSenderMessage(this.mc, this.mdb, this.mdr, this.version, this.peerId, fileId, chunkNo, replicationDegree, chunkContent);
 
         // Read Answers from MC channel
         int timeInterval = 1000; // 1 second
         int answers;
-        for (int n = 0; n < REPETITIONS; n ++) {
+        for (int n = 0; n < this.REPETITIONS; n ++) {
             // Send Message
             Utils.sendMessage(message);
             // Obtain answers during timeInterval
@@ -83,6 +82,10 @@ public class ClientEndpoint implements ServerCommands { // Peer endpoint that th
         Message message = new DeleteSenderMessage(this.mc, this.mdb, this.mdr, this.version, this.peerId, fileName);
         // Send message
         Utils.sendMessage(message);
+        for (int n = 0; n < this.REPETITIONS - 1; n ++) {
+            Utils.pause(Utils.getRandomNumber(0, 401));
+            Utils.sendMessage(message);
+        }
     }
 
     public void reclaimSpace(int space) {

@@ -2,6 +2,7 @@ package peer.messages;
 
 import peer.Channel;
 import peer.ChannelName;
+import peer.Utils;
 
 public class DeleteSenderMessage extends Message {
     private final String fileId;
@@ -26,7 +27,12 @@ public class DeleteSenderMessage extends Message {
 
     @Override
     public Message answer(int id) {
-        // TODO
+        // New Thread to deal with the answer
+        Thread thread = new Thread(() -> {
+            // Delete all chunks from this file stored in this peer
+            Utils.deleteFile(id, this.fileId);
+        });
+        thread.start();
         return null;
     }
 }
