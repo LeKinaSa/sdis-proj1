@@ -1,10 +1,13 @@
 package peer.messages;
 
+import peer.Channel;
+import peer.ChannelName;
+
 public class DeleteSenderMessage extends Message {
     private final String fileId;
 
-    public DeleteSenderMessage(String version, int peerId, String fileId) {
-        super(version, peerId);
+    public DeleteSenderMessage(Channel mc, Channel mdb, Channel mdr, String version, int peerId, String fileId) {
+        super(ChannelName.MC, mc, mdb, mdr, version, peerId);
         this.fileId = fileId;
     }
 
@@ -22,7 +25,7 @@ public class DeleteSenderMessage extends Message {
     }
 
     @Override
-    public byte[] answer(int id) {
+    public Message answer(int id) {
         // TODO
         return null;
     }

@@ -1,5 +1,7 @@
 package peer.messages;
 
+import peer.Channel;
+import peer.ChannelName;
 import peer.Utils;
 
 import java.nio.charset.StandardCharsets;
@@ -10,8 +12,8 @@ public class BackupSenderMessage extends Message {
     private final int replicationDegree;
     private final byte[] chunkContent;
 
-    public BackupSenderMessage(String version, int peerId, String fileId, int chunkNo, int replicationDegree, byte[] chunkContent) {
-        super(version, peerId);
+    public BackupSenderMessage(Channel mc, Channel mdb, Channel mdr, String version, int peerId, String fileId, int chunkNo, int replicationDegree, byte[] chunkContent) {
+        super(ChannelName.MDB, mc, mdb, mdr, version, peerId);
         this.fileId = fileId;
         this.chunkNo = chunkNo;
         this.replicationDegree = replicationDegree;
@@ -33,7 +35,7 @@ public class BackupSenderMessage extends Message {
     }
 
     @Override
-    public byte[] answer(int id) {
+    public Message answer(int id) {
         if (this.peerId == id) {
             return null;
         }
@@ -42,12 +44,11 @@ public class BackupSenderMessage extends Message {
             // Store the chunk (if the chunk isn't already stored in this peer)
             Utils.store(this.peerId, this.fileId, this.chunkNo, this.chunkContent);
         }
-        // TODO
+
         // Delay from [0, 400[ ms
         Utils.pause(Utils.getRandomNumber(0, 400));
 
-        // Send Message: BackupReceiverMessage(toMC channel)
-        Message message = new BackupReceiverMessage(this.version, this.peerId, this.fileId, this.chunkNo);
-        return message.assemble();
+        // Send Message: BackupReceiverMessage
+        return new BackupReceiverMessage(this.mc, this.mdb, this.mdr, this.version, this.peerId, this.fileId, this.chunkNo);
     }
 }

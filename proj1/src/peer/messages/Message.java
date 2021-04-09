@@ -15,17 +15,17 @@ public abstract class Message {
     private static final String CRLF = "\r\n"; // 0xD 0xA
 
     private final ChannelName channel;
-    private final Channel mc, mdb, mdr;
+    protected final Channel mc, mdb, mdr;
     protected final String version;
     protected final int peerId;
 
-    public Message(String version, int peerId, ChannelName channelName, Channel mc, Channel mdb, Channel mdr) {
-        this.version = version;
-        this.peerId = peerId;
+    public Message(ChannelName channelName, Channel mc, Channel mdb, Channel mdr, String version, int peerId) {
         this.channel = channelName;
         this.mc = mc;
         this.mdb = mdb;
         this.mdr = mdr;
+        this.version = version;
+        this.peerId = peerId;
     }
 
     protected byte[] generateMessageWithBody(String header, byte[] body) {
@@ -55,7 +55,7 @@ public abstract class Message {
         return aux.toByteArray();
     }
 
-    public static Message parse(DatagramPacket packet) {
+    public static Message parse(Channel mc, Channel mdb, Channel mdr, DatagramPacket packet) {
         String message = new String(packet.getData(), 0, packet.getLength());
         Matcher matcher = MESSAGE_PATTERN.matcher(message);
         if (matcher.matches()) {
@@ -81,7 +81,7 @@ public abstract class Message {
                         return null;
                     }
                     byte[] body = matcher.group("body").getBytes();
-                    return new BackupSenderMessage(version, senderId, fileId, chunkNo, replication, body);
+                    return new BackupSenderMessage(mc, mdb, mdr, version, senderId, fileId, chunkNo, replication, body);
                 }
                 case "STORED": {
                     String fileId = matcher.group("fileId");
@@ -91,7 +91,7 @@ public abstract class Message {
                     } catch (NumberFormatException exception) {
                         return null;
                     }
-                    return new BackupReceiverMessage(version, senderId, fileId, chunkNo);
+                    return new BackupReceiverMessage(mc, mdb, mdr, version, senderId, fileId, chunkNo);
                 }
                 case "GETCHUNK": {
                     String fileId = matcher.group("fileId");
@@ -101,7 +101,7 @@ public abstract class Message {
                     } catch (NumberFormatException exception) {
                         return null;
                     }
-                    return new RestoreSenderMessage(version, senderId, fileId, chunkNo);
+                    return new RestoreSenderMessage(mc, mdb, mdr, version, senderId, fileId, chunkNo);
                 }
                 case "CHUNK": {
                     String fileId = matcher.group("fileId");
@@ -112,11 +112,11 @@ public abstract class Message {
                         return null;
                     }
                     byte[] body = matcher.group("body").getBytes();
-                    return new RestoreReceiverMessage(version, senderId, fileId, chunkNo, body);
+                    return new RestoreReceiverMessage(mc, mdb, mdr, version, senderId, fileId, chunkNo, body);
                 }
                 case "DELETE": {
                     String fileId = matcher.group("fileId");
-                    return new DeleteSenderMessage(version, senderId, fileId);
+                    return new DeleteSenderMessage(mc, mdb, mdr, version, senderId, fileId);
                 }
                 case "REMOVED": {
                     String fileId = matcher.group("fileId");
@@ -126,7 +126,7 @@ public abstract class Message {
                     } catch (NumberFormatException exception) {
                         return null;
                     }
-                    return new ReclaimReceiverMessage(version, senderId, fileId, chunkNo);
+                    return new ReclaimReceiverMessage(mc, mdb, mdr, version, senderId, fileId, chunkNo);
                 }
                 default:
                     return null;
@@ -163,5 +163,5 @@ public abstract class Message {
 
     public abstract byte[] assemble();
 
-    public abstract byte[] answer(int id);
+    public abstract Message answer(int id);
 }

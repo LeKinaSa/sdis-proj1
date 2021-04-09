@@ -58,7 +58,7 @@ public class ListenerThread extends Thread {
             }
 
             // Obtain Message contained in Received Packet
-            Message message = Message.parse(p);
+            Message message = Message.parse(this.mc, this.mdb, this.mdr, p);
             if (message == null) {
                 String errorMessage = new String(p.getData(), 0, p.getLength());
                 PeerDebugger.println("Message received with error: " + errorMessage);
