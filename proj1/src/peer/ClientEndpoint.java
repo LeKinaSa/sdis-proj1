@@ -63,11 +63,26 @@ public class ClientEndpoint implements ServerCommands { // Peer endpoint that th
     private void backupChunk(byte[] chunkContent, int replicationDegree, String fileId, int chunkNo) {
         PeerDebugger.println("backup chunk with size:" + chunkContent.length);
 
+        final int REPETITIONS = 5;
+
         // Get Message
         Message messageMaker = new BackupSenderMessage(this.version, this.peerId, fileId, chunkNo, replicationDegree, chunkContent);
         byte[] message = messageMaker.assemble();
-        // Send Message
-        this.sendMessage(ipMDB, portMDB, message);
+
+        int timeInterval = 1000; // 1 second
+        int answers = 0;
+        for (int n = 0; n < REPETITIONS; n ++) {
+            // Send Message
+            this.sendMessage(ipMDB, portMDB, message);
+            // Obtain answers during timeInterval
+            answers = 0;
+            // TODO
+
+            if (answers >= replicationDegree) {
+                break;
+            }
+            timeInterval = timeInterval * 2;
+        }
     }
 
     public byte[] restoreFile(String fileName) {

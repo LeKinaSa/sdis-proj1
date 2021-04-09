@@ -1,5 +1,7 @@
 package peer.messages;
 
+import peer.Utils;
+
 import java.nio.charset.StandardCharsets;
 
 public class BackupSenderMessage extends Message {
@@ -36,10 +38,16 @@ public class BackupSenderMessage extends Message {
             return null;
         }
 
+        if (!Utils.fileExists(this.peerId, this.fileId, this.chunkNo)) {
+            // Store the chunk (if the chunk isn't already stored in this peer)
+            Utils.store(this.peerId, this.fileId, this.chunkNo, this.chunkContent);
+        }
         // TODO
-        // Backup chunk to his own file system
-        // Delay 0,400 ms
+        // Delay from [0, 400[ ms
+        Utils.pause(Utils.getRandomNumber(0, 400));
+
         // Send Message: BackupReceiverMessage(toMC channel)
-        return null;
+        Message message = new BackupReceiverMessage(this.version, this.peerId, this.fileId, this.chunkNo);
+        return message.assemble();
     }
 }
