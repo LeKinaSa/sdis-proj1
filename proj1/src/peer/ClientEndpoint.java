@@ -61,6 +61,7 @@ public class ClientEndpoint implements ServerCommands { // Peer endpoint that th
             // Obtain answers during timeInterval
             answers = 0;
             // TODO
+            Utils.pause(1000);
 
             if (answers >= replicationDegree) {
                 break;
