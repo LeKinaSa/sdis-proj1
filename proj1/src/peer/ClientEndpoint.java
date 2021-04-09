@@ -11,8 +11,7 @@ import java.util.Arrays;
 
 public class ClientEndpoint implements ServerCommands { // Peer endpoint that the client reaches out
     private final int CHUNK_SIZE = 64000;
-    private InetAddress ipMC, ipMDB, ipMDR;
-    private int portMC, portMDB, portMDR;
+    private Channel mc, mdb, mdr;
     private final String version;
     private final int peerId;
 
@@ -21,19 +20,10 @@ public class ClientEndpoint implements ServerCommands { // Peer endpoint that th
         this.peerId = id;
     }
 
-    public void setMC(InetAddress ip, int port) {
-        this.ipMC = ip;
-        this.portMC = port;
-    }
-
-    public void setMDB(InetAddress ip, int port) {
-        this.ipMDB = ip;
-        this.portMDB = port;
-    }
-
-    public void setMDR(InetAddress ip, int port) {
-        this.ipMDR = ip;
-        this.portMDR = port;
+    public void setChannels(Channel mc, Channel mdb, Channel mdr) {
+        this.mc = mc;
+        this.mdb = mdb;
+        this.mdr = mdr;
     }
 
     public void backupFile(String fileName, byte[] fileContents, int replicationDegree) {
@@ -66,14 +56,13 @@ public class ClientEndpoint implements ServerCommands { // Peer endpoint that th
         final int REPETITIONS = 5;
 
         // Get Message
-        Message messageMaker = new BackupSenderMessage(this.version, this.peerId, fileId, chunkNo, replicationDegree, chunkContent);
-        byte[] message = messageMaker.assemble();
+        Message message = new BackupSenderMessage(this.version, this.peerId, fileId, chunkNo, replicationDegree, chunkContent);
 
         int timeInterval = 1000; // 1 second
         int answers = 0;
         for (int n = 0; n < REPETITIONS; n ++) {
             // Send Message
-            this.sendMessage(ipMDB, portMDB, message);
+            Utils.sendMessage(message.getIp(), message.getPort(), message.assemble());
             // Obtain answers during timeInterval
             answers = 0;
             // TODO
@@ -98,7 +87,7 @@ public class ClientEndpoint implements ServerCommands { // Peer endpoint that th
         Message messageMaker = new DeleteSenderMessage(this.version, this.peerId, fileName);
         byte[] message = messageMaker.assemble();
         // Send message
-        this.sendMessage(ipMC, portMC, message);
+        Utils.sendMessage(mc.ip, mc.port, message);
     }
 
     public void reclaimSpace(int space) {
@@ -110,21 +99,5 @@ public class ClientEndpoint implements ServerCommands { // Peer endpoint that th
         PeerDebugger.println("state()");
         //TODO: implement
         return "hello";
-    }
-
-    private void sendMessage(InetAddress ip, int port, byte[] buf) {
-        DatagramSocket socket;
-        try {
-            socket = new DatagramSocket();
-        }
-        catch (SocketException exception) {
-            return;
-        }
-        DatagramPacket packet = new DatagramPacket(buf, buf.length, ip, port);
-        try {
-            socket.send(packet);
-        }
-        catch (IOException ignored) { }
-        socket.close();
     }
 }

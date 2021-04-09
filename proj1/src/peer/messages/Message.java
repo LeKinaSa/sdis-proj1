@@ -1,8 +1,12 @@
 package peer.messages;
 
+import peer.Channel;
+import peer.ChannelName;
+
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.net.DatagramPacket;
+import java.net.InetAddress;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -10,12 +14,18 @@ public abstract class Message {
     private static final Pattern MESSAGE_PATTERN = Pattern.compile("(?<version>[0-9]\\.[0-9]) +(?<type>PUTCHUNK|STORED|GETCHUNK|CHUNK|DELETE|REMOVED) +(?<senderId>[0-9]+) +((?<fileId>.*\\..*?) +)?((?<chunkNo>[0-9]+) +)?((?<replication>[0-9]+) +)?\r\n\r\n(?<body>.*)");
     private static final String CRLF = "\r\n"; // 0xD 0xA
 
+    private final ChannelName channel;
+    private final Channel mc, mdb, mdr;
     protected final String version;
     protected final int peerId;
 
-    public Message(String version, int peerId) {
+    public Message(String version, int peerId, ChannelName channelName, Channel mc, Channel mdb, Channel mdr) {
         this.version = version;
         this.peerId = peerId;
+        this.channel = channelName;
+        this.mc = mc;
+        this.mdb = mdb;
+        this.mdr = mdr;
     }
 
     protected byte[] generateMessageWithBody(String header, byte[] body) {
@@ -123,6 +133,32 @@ public abstract class Message {
             }
         }
         return null;
+    }
+
+    public InetAddress getIp() {
+        switch (this.channel) {
+            case MC:
+                return mc.ip;
+            case MDB:
+                return mdb.ip;
+            case MDR:
+                return mdr.ip;
+            default:
+                return null;
+        }
+    }
+
+    public int getPort() {
+        switch (this.channel) {
+            case MC:
+                return mc.port;
+            case MDB:
+                return mdb.port;
+            case MDR:
+                return mdr.port;
+            default:
+                return 0;
+        }
     }
 
     public abstract byte[] assemble();

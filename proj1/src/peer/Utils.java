@@ -1,5 +1,10 @@
 package peer;
 
+import java.io.IOException;
+import java.net.DatagramPacket;
+import java.net.DatagramSocket;
+import java.net.InetAddress;
+import java.net.SocketException;
 import java.util.Random;
 import java.util.concurrent.TimeUnit;
 
@@ -25,5 +30,21 @@ public class Utils {
 
     public static void store(int id, String fileId, int chunkNo, byte[] chunkContent) {
         // TODO
+    }
+
+    public static void sendMessage(InetAddress ip, int port, byte[] buf) {
+        DatagramSocket socket;
+        try {
+            socket = new DatagramSocket();
+        }
+        catch (SocketException exception) {
+            return;
+        }
+        DatagramPacket packet = new DatagramPacket(buf, buf.length, ip, port);
+        try {
+            socket.send(packet);
+        }
+        catch (IOException ignored) { }
+        socket.close();
     }
 }

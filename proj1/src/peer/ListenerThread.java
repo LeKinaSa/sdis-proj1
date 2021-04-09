@@ -12,29 +12,31 @@ public class ListenerThread extends Thread {
     // This size tries to guarantee that the full message will be read from the socket
 
     private int id;
-    private final InetAddress ip;
-    private final int port;
+    private ChannelName name;
+    private Channel mc, mdb, mdr;
     
-    public ListenerThread(int id, InetAddress ip, int port) {
+    public ListenerThread(int id, ChannelName name, Channel mc, Channel mdb, Channel mdr) {
         this.id = id;
-        this.ip = ip;
-        this.port = port;
+        this.name = name;
+        this.mc = mc;
+        this.mdb = mdb;
+        this.mdr = mdr;
     }
 
     public void run() {
-        PeerDebugger.println("Thread listening to " + ip + ":" + port);
+        PeerDebugger.println("Thread listening to " + this.getIp() + ":" + this.getPort());
         
         // Open Socket
         MulticastSocket socket;
         try {
-            socket = new MulticastSocket(port);
+            socket = new MulticastSocket(this.getPort());
         }
         catch (IOException exception) {
             PeerDebugger.println("Error occurred");
             return;
         }
         try {
-            socket.joinGroup(ip);
+            socket.joinGroup(this.getIp());
         }
         catch (IOException exception) {
             PeerDebugger.println("Error occurred: " + exception.getMessage());
@@ -71,9 +73,35 @@ public class ListenerThread extends Thread {
 
         // Close Socket
         try {
-            socket.leaveGroup(ip);
+            socket.leaveGroup(this.getIp());
         }
         catch (Exception ignored) { }
         socket.close();
+    }
+
+    private InetAddress getIp() {
+        switch (this.name) {
+            case MC:
+                return mc.ip;
+            case MDB:
+                return mdb.ip;
+            case MDR:
+                return mdr.ip;
+            default:
+                return null;
+        }
+    }
+
+    private int getPort() {
+        switch (this.name) {
+            case MC:
+                return mc.port;
+            case MDB:
+                return mdb.port;
+            case MDR:
+                return mdr.port;
+            default:
+                return 0;
+        }
     }
 }

@@ -50,34 +50,30 @@ public class Server {
         PeerDebugger.println("Starting services");
 
         // ----- Control channel service -----
-        // Parse
         if (!getInformationFromArg(args[3])) {
             return;
         }
-        obj.setMC(ip, port);
-        // Open
-        PeerDebugger.println("Starting first thread");
-        Thread mcThread = new ListenerThread(id, ip, port);
-        mcThread.start();
-        
+        Channel mc = new Channel(ip, port);
+
         // ----- Backup service -----
-        // Parse
         if (!getInformationFromArg(args[4])) {
             return;
         }
-        obj.setMDB(ip, port);
-        // Open
-        Thread mdbThread = new ListenerThread(id, ip, port);
-        mdbThread.start();
+        Channel mdb = new Channel(ip, port);
 
         // ----- Restore service -----
-        // Parse
         if (!getInformationFromArg(args[5])) {
             return;
         }
-        obj.setMDR(ip, port);
-        // Open
-        Thread mdrThread = new ListenerThread(id, ip, port);
+        Channel mdr = new Channel(ip, port);
+
+        // --------------- Initiate Threads ---------------
+        obj.setChannels(mc, mdb, mdr);
+        Thread mcThread  = new ListenerThread(id, ChannelName.MC , mc, mdb, mdr);
+        mcThread.start();
+        Thread mdbThread = new ListenerThread(id, ChannelName.MDB, mc, mdb, mdr);
+        mdbThread.start();
+        Thread mdrThread = new ListenerThread(id, ChannelName.MDR, mc, mdb, mdr);
         mdrThread.start();
 
         // --------------- Server is Ready ---------------
