@@ -35,4 +35,12 @@ public class RestoreReceiverMessage extends Message {
     public Message answer(int id) {
         return null;
     }
+
+    public byte[] getChunk() {
+        return this.chunkContent;
+    }
+
+    public boolean correspondsTo(String fileId, int chunkNo) {
+        return this.fileId.equals(fileId) && (this.chunkNo == chunkNo);
+    }
 }

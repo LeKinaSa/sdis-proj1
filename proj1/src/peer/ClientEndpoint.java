@@ -2,6 +2,7 @@ package peer;
 
 import peer.messages.*;
 
+import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.net.DatagramPacket;
 import java.net.MulticastSocket;
@@ -13,6 +14,8 @@ public class ClientEndpoint implements ServerCommands { // Peer endpoint that th
     private Channel mc, mdb, mdr;
     private final String version;
     private final int peerId;
+
+    // TODO: check fileName (if this file is in a directory, should it be in a directory once it is inside the peer-data folder? -> probably not)
 
     public ClientEndpoint(String version, int id) {
         this.version = version;
@@ -87,7 +90,7 @@ public class ClientEndpoint implements ServerCommands { // Peer endpoint that th
             answers = 0;
             while (current_timestamp < initial_timestamp + timeInterval) {
                 try {
-                    socket.receive(p);
+                    socket.receive(p); // TODO: should this be non blocking ? so it doesnt get stuck here forever
                     Message answer = Message.parse(mc, mdb, mdr, p);
                     if (answer instanceof BackupReceiverMessage) {
                         answers ++;
@@ -111,9 +114,67 @@ public class ClientEndpoint implements ServerCommands { // Peer endpoint that th
     }
 
     public byte[] restoreFile(String fileName) {
+        // TODO: introduce timeout? so it doesnt get stuck here forever
         PeerDebugger.println("restoreFile()");
-        //TODO: implement
-        return new byte[0];
+
+        // aux will be holding the file data
+        ByteArrayOutputStream aux = new ByteArrayOutputStream();
+
+        // Open MDR Channel
+        MulticastSocket socket;
+        try {
+            socket = new MulticastSocket(mdr.port);
+        }
+        catch (IOException exception) {
+            PeerDebugger.println("Error occurred");
+            return null;
+        }
+        try {
+            socket.joinGroup(mdr.ip);
+        }
+        catch (IOException exception) {
+            PeerDebugger.println("Error occurred: " + exception.getMessage());
+            socket.close();
+            return null;
+        }
+
+        int chunk = 0;
+        int chunkSize = CHUNK_SIZE;
+        byte[] buf = new byte[Message.MESSAGE_SIZE];
+        DatagramPacket p = new DatagramPacket(buf, buf.length);
+        while (chunkSize < CHUNK_SIZE) {
+            // Get message
+            Message message = new RestoreSenderMessage(this.mc, this.mdb, this.mdr, this.version, this.peerId, fileName, chunk);
+            // Send message
+            Utils.sendMessage(message);
+
+            // Receive answer
+            try {
+                socket.receive(p);
+            }
+            catch (IOException exception) {
+                continue;
+            }
+            Message answer = Message.parse(this.mc, this.mdb, this.mdr, p);
+            if (answer instanceof RestoreReceiverMessage) {
+                RestoreReceiverMessage restoreAnswer = (RestoreReceiverMessage) answer;
+                // Verify if the chunk is the one we need
+                if (restoreAnswer.correspondsTo(fileName, chunk)) {
+                    // Write chunk to aux
+                    try {
+                        aux.write(restoreAnswer.getChunk());
+                    } catch (IOException exception) {
+                        continue;
+                    }
+                    // Check chunk size
+                    chunkSize = restoreAnswer.getChunk().length;
+                }
+            }
+            // Chunk received and stored -> continue to next chunk
+            chunk ++;
+        }
+        return aux.toByteArray();
+        // TODO: what am i supposed to do with this byte[]
     }
 
     public void deleteFile(String fileName) {
