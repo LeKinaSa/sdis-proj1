@@ -2,6 +2,9 @@ package peer;
 
 import peer.messages.*;
 
+import java.io.IOException;
+import java.net.DatagramPacket;
+import java.net.MulticastSocket;
 import java.util.Arrays;
 
 public class ClientEndpoint implements ServerCommands { // Peer endpoint that the client reaches out
@@ -52,22 +55,59 @@ public class ClientEndpoint implements ServerCommands { // Peer endpoint that th
         // Get Message
         Message message = new BackupSenderMessage(this.mc, this.mdb, this.mdr, this.version, this.peerId, fileId, chunkNo, replicationDegree, chunkContent);
 
+        // Open MC Socket
+        MulticastSocket socket;
+        try {
+            socket = new MulticastSocket(mc.port);
+        }
+        catch (IOException exception) {
+            PeerDebugger.println("Error occurred");
+            return;
+        }
+        try {
+            socket.joinGroup(mc.ip);
+        }
+        catch (IOException exception) {
+            PeerDebugger.println("Error occurred: " + exception.getMessage());
+            socket.close();
+            return;
+        }
+
         // Read Answers from MC channel
         int timeInterval = 1000; // 1 second
         int answers;
+        byte[] buf = new byte[Message.MESSAGE_SIZE];
+        DatagramPacket p = new DatagramPacket(buf, buf.length);
         for (int n = 0; n < this.REPETITIONS; n ++) {
             // Send Message
             Utils.sendMessage(message);
             // Obtain answers during timeInterval
+            long initial_timestamp = System.currentTimeMillis();
+            long current_timestamp = System.currentTimeMillis();
             answers = 0;
-            // TODO
-            Utils.pause(1000);
+            while (current_timestamp < initial_timestamp + timeInterval) {
+                try {
+                    socket.receive(p);
+                    Message answer = Message.parse(mc, mdb, mdr, p);
+                    if (answer instanceof BackupReceiverMessage) {
+                        answers ++;
+                    }
+                }
+                catch (IOException ignored) { }
+                current_timestamp = System.currentTimeMillis();
+            }
 
             if (answers >= replicationDegree) {
                 break;
             }
             timeInterval = timeInterval * 2;
         }
+        // Close Socket
+        try {
+            socket.leaveGroup(mc.ip);
+        }
+        catch (Exception ignored) { }
+        socket.close();
     }
 
     public byte[] restoreFile(String fileName) {

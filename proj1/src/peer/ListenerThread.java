@@ -8,9 +8,6 @@ import java.net.InetAddress;
 import java.net.MulticastSocket;
 
 public class ListenerThread extends Thread {
-    private static final int MESSAGE_SIZE = 65000;
-    // This size tries to guarantee that the full message will be read from the socket
-
     private int id;
     private ChannelName name;
     private Channel mc, mdb, mdr;
@@ -45,7 +42,7 @@ public class ListenerThread extends Thread {
         }
         
         // Read messages
-        byte[] buf = new byte[MESSAGE_SIZE];
+        byte[] buf = new byte[Message.MESSAGE_SIZE];
         DatagramPacket p = new DatagramPacket(buf, buf.length);
         int x = 1;
         while (x == 1) { // TODO: non infinite loop

@@ -125,6 +125,7 @@ public class Utils {
             socket.send(packet);
         }
         catch (IOException ignored) { }
+        // TODO: do i need to flush?
         socket.close();
     }
 }
