@@ -2,16 +2,18 @@ package peer.messages;
 
 import peer.Channel;
 import peer.ChannelName;
+import peer.Utils;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.net.DatagramPacket;
 import java.net.InetAddress;
+import java.util.Arrays;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 public abstract class Message {
-    private static final Pattern MESSAGE_PATTERN = Pattern.compile("(?<version>[0-9]\\.[0-9]) +(?<type>PUTCHUNK|STORED|GETCHUNK|CHUNK|DELETE|REMOVED) +(?<senderId>[0-9]+) +((?<fileId>.*\\..*?) +)?((?<chunkNo>[0-9]+) +)?((?<replication>[0-9]+) +)?\r\n\r\n(?<body>.*)");
+    private static final Pattern HEADER_PATTERN = Pattern.compile("(?<version>[0-9]\\.[0-9]) +(?<type>PUTCHUNK|STORED|GETCHUNK|CHUNK|DELETE|REMOVED) +(?<senderId>[0-9]+) +((?<fileId>.*\\..*?) +)?((?<chunkNo>[0-9]+) +)?((?<replication>[0-9]+) +)?");
     private static final String CRLF = "\r\n"; // 0xD 0xA
 
     private final ChannelName channel;
@@ -55,11 +57,25 @@ public abstract class Message {
         return aux.toByteArray();
     }
 
+    private static byte[] getSeparator() {
+        ByteArrayOutputStream aux = new ByteArrayOutputStream();
+        try {
+            aux.write(CRLF.getBytes());
+            aux.write(CRLF.getBytes());
+        }
+        catch (IOException exception) {
+            return null;
+        }
+        return aux.toByteArray();
+    }
+
     public static Message parse(Channel mc, Channel mdb, Channel mdr, DatagramPacket packet) {
-        String message = new String(packet.getData(), 0, packet.getLength());
-        Matcher matcher = MESSAGE_PATTERN.matcher(message);
+        byte[] separator = getSeparator();
+        int index = Utils.indexOf(packet.getData(), separator);
+        String header = new String(packet.getData(), 0, index);
+        Matcher matcher = HEADER_PATTERN.matcher(header);
         if (matcher.matches()) {
-            // Matches: version type senderId fileId chunkNo replication body
+            // Matches: version type senderId fileId chunkNo replication (separator) body
             String version = matcher.group("version");
             int senderId;
             try {
@@ -80,7 +96,7 @@ public abstract class Message {
                     } catch (NumberFormatException exception) {
                         return null;
                     }
-                    byte[] body = matcher.group("body").getBytes();
+                    byte[] body = Arrays.copyOfRange(packet.getData(), index + separator.length, packet.getLength());
                     return new BackupSenderMessage(mc, mdb, mdr, version, senderId, fileId, chunkNo, replication, body);
                 }
                 case "STORED": {
@@ -111,7 +127,7 @@ public abstract class Message {
                     } catch (NumberFormatException exception) {
                         return null;
                     }
-                    byte[] body = matcher.group("body").getBytes();
+                    byte[] body = Arrays.copyOfRange(packet.getData(), index + separator.length, packet.getLength());
                     return new RestoreReceiverMessage(mc, mdb, mdr, version, senderId, fileId, chunkNo, body);
                 }
                 case "DELETE": {

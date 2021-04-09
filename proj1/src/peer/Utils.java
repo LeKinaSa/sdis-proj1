@@ -27,6 +27,23 @@ public class Utils {
         }
     }
 
+    public static int indexOf(byte[] array, byte[] matchingSequence) {
+        boolean found;
+        for (int i = 0; i < array.length - matchingSequence.length + 1; i ++) {
+            found = true;
+            for (int j = 0; j < matchingSequence.length; j ++) {
+                if (array[i + j] != matchingSequence[j]) {
+                    found = false;
+                    break;
+                }
+            }
+            if (found) {
+                return i;
+            }
+        }
+        return -1;
+    }
+
     public static boolean fileExists(int id, String fileId, int chunkNo) {
         File file = new File("../peer-data/" + id + "/" + fileId + "/" + chunkNo);
         return file.exists();
