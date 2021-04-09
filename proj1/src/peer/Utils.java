@@ -1,5 +1,7 @@
 package peer;
 
+import peer.messages.Message;
+
 import java.io.IOException;
 import java.net.DatagramPacket;
 import java.net.DatagramSocket;
@@ -32,7 +34,10 @@ public class Utils {
         // TODO
     }
 
-    public static void sendMessage(InetAddress ip, int port, byte[] buf) {
+    public static void sendMessage(Message message) {
+        InetAddress ip = message.getIp();
+        int port = message.getPort();
+        byte[] buf = message.assemble();
         DatagramSocket socket;
         try {
             socket = new DatagramSocket();

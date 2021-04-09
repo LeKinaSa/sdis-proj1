@@ -67,8 +67,10 @@ public class ListenerThread extends Thread {
 
             // Execute the Necessary Action based on the Received Message
             PeerDebugger.println("Message received: " + message.toString());
-            message.answer(this.id);
-            // TODO: Problems: (backup) this thread is based on mdb channel and answer needs to go to mc channel
+            Message answer = message.answer(this.id);
+            if (answer != null) {
+                Utils.sendMessage(answer);
+            }
         }
 
         // Close Socket
