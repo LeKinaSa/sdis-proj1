@@ -33,7 +33,6 @@ public class RestoreReceiverMessage extends Message {
 
     @Override
     public Message answer(int id) {
-        // TODO
         return null;
     }
 }

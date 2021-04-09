@@ -45,10 +45,16 @@ public class BackupSenderMessage extends Message {
             Utils.store(this.peerId, this.fileId, this.chunkNo, this.chunkContent);
         }
 
-        // Delay from [0, 400[ ms
-        Utils.pause(Utils.getRandomNumber(0, 400));
+        // New Thread
+        Thread thread = new Thread(() -> {
+            // Delay from [0, 400[ ms
+            Utils.pause(Utils.getRandomNumber(0, 401));
 
-        // Send Message: BackupReceiverMessage
-        return new BackupReceiverMessage(this.mc, this.mdb, this.mdr, this.version, this.peerId, this.fileId, this.chunkNo);
+            // Send Message: BackupReceiverMessage
+            Message answer = new BackupReceiverMessage(this.mc, this.mdb, this.mdr, this.version, this.peerId, this.fileId, this.chunkNo);
+            Utils.sendMessage(answer);
+        });
+        thread.start();
+        return null;
     }
 }
