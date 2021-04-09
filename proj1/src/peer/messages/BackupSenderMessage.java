@@ -2,6 +2,7 @@ package peer.messages;
 
 import peer.Channel;
 import peer.ChannelName;
+import peer.PeerDebugger;
 import peer.Utils;
 
 import java.nio.charset.StandardCharsets;
@@ -44,7 +45,10 @@ public class BackupSenderMessage extends Message {
         Thread thread = new Thread(() -> {
             if (!Utils.fileExists(id, this.fileId, this.chunkNo)) {
                 // Store the chunk (if the chunk isn't already stored in this peer)
-                Utils.store(id, this.fileId, this.chunkNo, this.chunkContent);
+                if (!Utils.store(id, this.fileId, this.chunkNo, this.chunkContent)) {
+                    PeerDebugger.println("Error when storing " + this.fileId + " chunk " + this.chunkNo);
+                    return;
+                }
             }
             // Delay from [0, 400[ ms
             Utils.pause(Utils.getRandomNumber(0, 401));
