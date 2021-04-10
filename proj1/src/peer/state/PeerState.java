@@ -26,12 +26,51 @@ public class PeerState {
         return this.storageCapacity >= this.currentCapacity + size;
     }
 
+    public boolean storageIsStable() {
+        return this.currentCapacity <= this.storageCapacity;
+    }
+
     public void readjustCapacity(int newStorageCapacity) {
         this.storageCapacity = newStorageCapacity;
-        if (this.currentCapacity <= this.storageCapacity) {
+        if (this.storageIsStable()) {
             return;
         }
-        // TODO: may be used by reclaim protocol
+
+        // Separate All Chunks in Safe and Unsafe for Removal
+        List<BackedUpChunk> safeRemoves = new ArrayList<>();
+        List<BackedUpChunk> unsafeRemoves = new ArrayList<>();
+        for (BackedUpChunk chunk : this.chunks) {
+            if (chunk.canBeRemovedSafely()) {
+                safeRemoves.add(chunk);
+            }
+            else {
+                unsafeRemoves.add(chunk);
+            }
+        }
+
+        // Firstly, Remove the Safe Chunks
+        for (BackedUpChunk safeRemove : safeRemoves) {
+            // Remove the Chunk
+            this.removeChunkFromPeerStorage(safeRemove);
+            // Alert the Other Peers
+            // TODO: Alert other peers
+            // Verify if More Removals are Needed
+            if (this.storageIsStable()) {
+                return;
+            }
+        }
+
+        // Then, Remove the Other Ones (since the peer is still out of storage space)
+        for (BackedUpChunk unsafeRemove : unsafeRemoves) {
+            // Remove the Chunk
+            this.removeChunkFromPeerStorage(unsafeRemove);
+            // Alert the Other Peers
+            // TODO: Alert other peers
+            // Verify if More Removals are Needed
+            if (this.storageIsStable()) {
+                return;
+            }
+        }
     }
 
     public void insertFile(String pathname, String fileId, int replicationDegree) {
@@ -68,8 +107,7 @@ public class PeerState {
             }
         }
         for (BackedUpChunk chunk : removedChunks) {
-            this.currentCapacity = this.currentCapacity - chunk.getSize();
-            this.chunks.remove(chunk);
+            this.removeChunkFromPeerStorage(chunk);
         }
     }
 
@@ -95,11 +133,15 @@ public class PeerState {
     public void removeChunk(String fileId, int chunkNo) {
         for (BackedUpChunk chunk : this.chunks) {
             if (chunk.correspondsTo(fileId, chunkNo)) {
-                this.currentCapacity = this.currentCapacity - chunk.getSize();
-                this.chunks.remove(chunk);
+                this.removeChunkFromPeerStorage(chunk);
                 break;
             }
         }
+    }
+
+    public void removeChunkFromPeerStorage(BackedUpChunk chunk) {
+        this.currentCapacity = this.currentCapacity - chunk.getSize();
+        this.chunks.remove(chunk);
     }
 
     public String toString() {

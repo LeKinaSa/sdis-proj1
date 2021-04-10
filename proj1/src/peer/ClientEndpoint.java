@@ -199,7 +199,8 @@ public class ClientEndpoint implements ServerCommands { // Peer endpoint that th
 
     public void reclaimSpace(int space) {
         PeerDebugger.println("reclaimSpace()");
-        //TODO: implement
+        // space is in KBytes and the capacity in peer state is in Bytes
+        PeerState.INSTANCE.readjustCapacity(space * 1000);
     }
 
     public String state() {

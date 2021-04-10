@@ -37,6 +37,10 @@ public class BackedUpChunk {
         return this.fileId.equals(fileId);
     }
 
+    public boolean canBeRemovedSafely() {
+        return this.perceivedReplicationDegree.size() > this.desiredReplicationDegree;
+    }
+
     public String toString() {
         String chunkState = "";
         chunkState += "\tFile: " + this.fileId + ":" + this.chunkNo + "\n";
