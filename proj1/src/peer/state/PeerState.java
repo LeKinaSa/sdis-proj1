@@ -27,6 +27,10 @@ public class PeerState {
     }
 
     public void readjustCapacity(int newStorageCapacity) {
+        this.storageCapacity = newStorageCapacity;
+        if (this.currentCapacity <= this.storageCapacity) {
+            return;
+        }
         // TODO: may be used by reclaim protocol
     }
 
