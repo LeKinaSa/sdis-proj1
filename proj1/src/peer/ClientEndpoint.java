@@ -36,13 +36,13 @@ public class ClientEndpoint implements ServerCommands { // Peer endpoint that th
         int toBackUp;
         int chunk = 0;
 
-        String fileId = ""; // TODO: get fileId
+        String fileId = fileName; // TODO: get fileId from fileName
         PeerState.INSTANCE.insertFile(fileName, fileId, replicationDegree);
         while (backedUp < fileSize) {
             toBackUp = Math.min(Message.CHUNK_SIZE, fileSize - backedUp);
 
             // Backup Chunk [backedUp, backedUp + toBackUp[
-            backupChunk(Arrays.copyOfRange(fileContents, backedUp, backedUp + toBackUp), replicationDegree, fileName, chunk);
+            backupChunk(Arrays.copyOfRange(fileContents, backedUp, backedUp + toBackUp), replicationDegree, fileId, chunk);
             backedUp += toBackUp;
             chunk += 1;
         }
@@ -50,7 +50,7 @@ public class ClientEndpoint implements ServerCommands { // Peer endpoint that th
         // File size is a multiple of the chunk size
         if (fileSize % Message.CHUNK_SIZE == 0) {
             // Backup Chunk with size 0
-            backupChunk(new byte[0], replicationDegree, fileName, chunk);
+            backupChunk(new byte[0], replicationDegree, fileId, chunk);
         }
     }
 
@@ -80,7 +80,7 @@ public class ClientEndpoint implements ServerCommands { // Peer endpoint that th
 
         // Read Answers from MC channel
         int timeInterval = 1000; // 1 second
-        int answers;
+        int answers = 0;
         byte[] buf = new byte[Message.MESSAGE_SIZE];
         DatagramPacket p = new DatagramPacket(buf, buf.length);
         for (int n = 0; n < this.REPETITIONS; n ++) {
@@ -108,6 +108,10 @@ public class ClientEndpoint implements ServerCommands { // Peer endpoint that th
             }
             timeInterval = timeInterval * 2;
         }
+
+        // Add perceivedReplicationDegree to peer state
+        PeerState.INSTANCE.insertReplicationDegreeOnFileChunk(fileId, chunkNo, answers);
+
         // Close Socket
         try {
             socket.leaveGroup(mc.ip);

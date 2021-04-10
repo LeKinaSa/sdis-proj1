@@ -16,6 +16,10 @@ public class BackedUpFile {
         this.perceivedReplicationDegreePerChunk = new HashMap<>();
     }
 
+    public boolean correspondsTo(String fileId) {
+        return this.fileId.equals(fileId);
+    }
+
     public void putChunk(int chunkNo, int perceivedReplicationDegree) {
         this.perceivedReplicationDegreePerChunk.remove(chunkNo);
         this.perceivedReplicationDegreePerChunk.put(chunkNo, perceivedReplicationDegree);
