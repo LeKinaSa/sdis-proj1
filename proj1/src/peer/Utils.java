@@ -8,11 +8,17 @@ import java.net.DatagramPacket;
 import java.net.DatagramSocket;
 import java.net.InetAddress;
 import java.net.SocketException;
+import java.nio.charset.StandardCharsets;
 import java.util.Arrays;
 import java.util.Random;
 import java.util.concurrent.TimeUnit;
 
+import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
+
 public class Utils {
+    private static final Gson gson = new GsonBuilder().setPrettyPrinting().create();
+
     public static int getRandomNumber(int min, int max) {
         Random random = new Random();
         return random.nextInt(max - min) + min;
@@ -143,5 +149,34 @@ public class Utils {
         catch (IOException ignored) { }
         // TODO: do i need to flush?
         socket.close();
+    }
+
+    public static PeerState loadState(int peerId) {
+        PeerState state = null;
+        File peerStateFile = new File("../peer-data/" + peerId + "/state.json");
+        if (peerStateFile.exists()) {
+            try (BufferedReader reader = new BufferedReader(new InputStreamReader(new FileInputStream(peerStateFile), StandardCharsets.UTF_8))) {
+                state = Utils.gson.fromJson(reader, PeerState.class);
+            } catch(Exception ignored) { }
+        }
+        if (state == null) {
+            state = new PeerState();
+        }
+        return state;
+    }
+
+    public static void saveState(int peerId) {
+        File peerStateFile = new File("../peer-data/" + peerId + "/state.json");
+        try {
+            peerStateFile.createNewFile();
+            try (BufferedWriter writer = new BufferedWriter(new OutputStreamWriter(new FileOutputStream(peerStateFile), StandardCharsets.UTF_8))) {
+                writer.write(Utils.gson.toJson(ClientEndpoint.state));
+            }
+        }
+        catch (IOException ignored) { }
+    }
+
+    public static void scheduleSave(int peerId) {
+        // TODO: schedule periodic state save
     }
 }

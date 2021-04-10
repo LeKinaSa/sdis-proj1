@@ -21,6 +21,8 @@ public class ClientEndpoint implements ServerCommands { // Peer endpoint that th
     // TODO: check fileName (if this file is in a directory, should it be in a directory once it is inside the peer-data folder? -> probably not)
 
     public ClientEndpoint(String version, int id) {
+        ClientEndpoint.state = Utils.loadState(id);
+        Utils.scheduleSave(id);
         this.version = version;
         this.peerId = id;
     }
@@ -204,7 +206,6 @@ public class ClientEndpoint implements ServerCommands { // Peer endpoint that th
             chunk ++;
         }
         return aux.toByteArray();
-        // TODO: what am i supposed to do with this byte[]
     }
 
     public void deleteFile(String fileName) {
