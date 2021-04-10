@@ -54,8 +54,10 @@ public class PeerState {
 
         // Firstly, Remove the Safe Chunks
         for (BackedUpChunk safeRemove : safeRemoves) {
-            // Remove the Chunk
+            // Remove the Chunk from the Peer State
             this.removeChunkFromPeerStorage(safeRemove);
+            // Remove the Chunk from the Peer Storage
+            Utils.deleteChunk(peer.getId(), safeRemove.getFileId(), safeRemove.getChunkNo());
             // Alert the Other Peers
             this.alertOtherPeersOfChunkDeletion(peer, safeRemove, repetitions);
             // Verify if More Removals are Needed
@@ -66,8 +68,10 @@ public class PeerState {
 
         // Then, Remove the Other Ones (since the peer is still out of storage space)
         for (BackedUpChunk unsafeRemove : unsafeRemoves) {
-            // Remove the Chunk
+            // Remove the Chunk from the Peer State
             this.removeChunkFromPeerStorage(unsafeRemove);
+            // Remove the Chunk from the Peer Storage
+            Utils.deleteChunk(peer.getId(), unsafeRemove.getFileId(), unsafeRemove.getChunkNo());
             // Alert the Other Peers
             this.alertOtherPeersOfChunkDeletion(peer, unsafeRemove, repetitions);
             // Verify if More Removals are Needed

@@ -131,6 +131,15 @@ public class Utils {
         }
     }
 
+    public static void deleteChunk(int id, String fileId, int chunkNo) {
+        File file = new File("../peer-data/" + id + "/" + fileId + "/" + chunkNo);
+        file.delete();
+        File directory = new File("../peer-data/" + id + "/" + fileId);
+        if (directory.listFiles() == null) {
+            directory.delete();
+        }
+    }
+
     public static void sendMessage(Message message) {
         InetAddress ip = message.getIp();
         int port = message.getPort();
