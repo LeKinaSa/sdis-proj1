@@ -8,16 +8,16 @@ import java.net.DatagramPacket;
 import java.net.DatagramSocket;
 import java.net.InetAddress;
 import java.net.SocketException;
-import java.nio.charset.StandardCharsets;
+/*import java.nio.charset.StandardCharsets;*/
 import java.util.Arrays;
 import java.util.Random;
 import java.util.concurrent.TimeUnit;
 
-import com.google.gson.Gson;
-import com.google.gson.GsonBuilder;
+/*import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;*/
 
 public class Utils {
-    private static final Gson gson = new GsonBuilder().setPrettyPrinting().create();
+    //private static final Gson gson = new GsonBuilder().setPrettyPrinting().create();
 
     public static int getRandomNumber(int min, int max) {
         Random random = new Random();
@@ -153,12 +153,12 @@ public class Utils {
 
     public static PeerState loadState(int peerId) {
         PeerState state = null;
-        File peerStateFile = new File("../peer-data/" + peerId + "/state.json");
+        /*File peerStateFile = new File("../peer-data/" + peerId + "/state.json");
         if (peerStateFile.exists()) {
             try (BufferedReader reader = new BufferedReader(new InputStreamReader(new FileInputStream(peerStateFile), StandardCharsets.UTF_8))) {
                 state = Utils.gson.fromJson(reader, PeerState.class);
             } catch(Exception ignored) { }
-        }
+        }*/
         if (state == null) {
             state = new PeerState();
         }
@@ -166,14 +166,14 @@ public class Utils {
     }
 
     public static void saveState(int peerId) {
-        File peerStateFile = new File("../peer-data/" + peerId + "/state.json");
+        /*File peerStateFile = new File("../peer-data/" + peerId + "/state.json");
         try {
             peerStateFile.createNewFile();
             try (BufferedWriter writer = new BufferedWriter(new OutputStreamWriter(new FileOutputStream(peerStateFile), StandardCharsets.UTF_8))) {
                 writer.write(Utils.gson.toJson(ClientEndpoint.state));
             }
         }
-        catch (IOException ignored) { }
+        catch (IOException ignored) { }*/
     }
 
     public static void scheduleSave(int peerId) {
