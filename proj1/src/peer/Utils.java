@@ -10,6 +10,7 @@ import java.net.DatagramPacket;
 import java.net.DatagramSocket;
 import java.net.InetAddress;
 import java.net.SocketException;
+import java.util.Arrays;
 import java.util.Random;
 import java.util.concurrent.TimeUnit;
 
@@ -106,9 +107,9 @@ public class Utils {
             try {
                 // Load information from inside the file
                 FileInputStream stream = new FileInputStream("../peer-data/" + id + "/" + fileId + "/" + chunkNo);
-                stream.read(buf);
+                int readSize = stream.read(buf);
                 stream.close();
-                return buf;
+                return Arrays.copyOfRange(buf, 0, readSize);
             }
             catch (IOException ignored) { }
         }

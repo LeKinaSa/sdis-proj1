@@ -131,7 +131,10 @@ public abstract class Message {
                     } catch (NumberFormatException exception) {
                         return null;
                     }
-                    byte[] body = Arrays.copyOfRange(packet.getData(), index + separator.length, packet.getLength());
+                    byte[] body = new byte[0];
+                    if ((index + separator.length) != packet.getLength()) {
+                        body = Arrays.copyOfRange(packet.getData(), index + separator.length, packet.getLength());
+                    }
                     return new RestoreReceiverMessage(mc, mdb, mdr, version, senderId, fileId, chunkNo, body);
                 }
                 case "DELETE": {
