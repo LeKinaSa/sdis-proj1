@@ -33,6 +33,10 @@ public class BackedUpChunk {
         return this.fileId.equals(fileId) && (this.chunkNo == chunkNo);
     }
 
+    public boolean belongsTo(String fileId) {
+        return this.fileId.equals(fileId);
+    }
+
     public String toString() {
         String chunkState = "";
         chunkState += "\tFile: " + this.fileId + ":" + this.chunkNo + "\n";

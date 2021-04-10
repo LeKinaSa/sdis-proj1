@@ -55,6 +55,26 @@ public class PeerState {
         }
     }
 
+    public void removeFile(String fileId) {
+        for (BackedUpFile file : this.files) {
+            if (file.correspondsTo(fileId)) {
+                this.files.remove(file);
+                break;
+            }
+        }
+
+        List<BackedUpChunk> removedChunks = new ArrayList<>();
+        for (BackedUpChunk chunk : this.chunks) {
+            if (chunk.belongsTo(fileId)) {
+                removedChunks.add(chunk);
+            }
+        }
+        for (BackedUpChunk chunk : removedChunks) {
+            this.currentCapacity = this.currentCapacity - chunk.getSize();
+            this.chunks.remove(chunk);
+        }
+    }
+
     public boolean insertChunk(String fileId, int chunkNo, int size, int replicationDegree) {
         BackedUpChunk chunk = new BackedUpChunk(fileId, chunkNo, size, replicationDegree);
         if (this.fits(chunk.getSize())) {
