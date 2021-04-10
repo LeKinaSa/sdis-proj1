@@ -12,7 +12,7 @@
 # Check number input arguments
 argc=$#
 
-if ((argc == 1 ))
+if [ $# -eq 1 ] 
 then
 	peer_id=$1
 else 
@@ -27,3 +27,4 @@ fi
 # Bash Guide for Beginners: https://tldp.org/LDP/Bash-Beginners-Guide/html/index.html
 # Advanced Bash Scripting: https://tldp.org/LDP/abs/html/
 
+rm -r ../peer-data/$1
