@@ -1,5 +1,7 @@
 package peer.clientCommands;
 
+import peer.PeerDebugger;
+
 public class RestoreCommand extends ClientCommand {
     private final String file;
 
@@ -18,7 +20,8 @@ public class RestoreCommand extends ClientCommand {
     public void execute() {
         System.out.println("Executing restore...");
         try {
-            stub.restoreFile(this.file);
+            byte[] fileBytes = stub.restoreFile(this.file);
+            PeerDebugger.println("File Restored: " + new String(fileBytes)); // TODO: what do i do with these bytes
         } catch (Exception e) {
             System.err.println("Client exception: " + e.toString());
             e.printStackTrace();

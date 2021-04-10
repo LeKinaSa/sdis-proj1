@@ -75,6 +75,9 @@ public abstract class Message {
 
     public static Message parse(Channel mc, Channel mdb, Channel mdr, DatagramPacket packet) {
         byte[] separator = getSeparator();
+        if (separator == null) {
+            return null;
+        }
         int index = Utils.indexOf(packet.getData(), separator);
         String header = new String(packet.getData(), 0, index);
         Matcher matcher = HEADER_PATTERN.matcher(header);
