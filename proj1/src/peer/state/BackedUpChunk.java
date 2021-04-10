@@ -1,6 +1,5 @@
 package peer.state;
 
-import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.Set;
 
@@ -31,10 +30,12 @@ public class BackedUpChunk {
         return this.size;
     }
 
-    public void peerHasChunk(int peerId) {
-        if (!this.perceivedReplicationDegree.contains(peerId)) {
-            this.perceivedReplicationDegree.add(peerId);
-        }
+    public void peerAddedChunk(int peerId) {
+        this.perceivedReplicationDegree.add(peerId);
+    }
+
+    public void peerRemovedChunk(int peerId) {
+        this.perceivedReplicationDegree.remove(peerId);
     }
 
     public boolean correspondsTo(String fileId, int chunkNo) {

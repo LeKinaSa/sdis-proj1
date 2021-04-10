@@ -187,6 +187,10 @@ public abstract class Message {
         }
     }
 
+    public int getPeerId() {
+        return this.messagePeerId;
+    }
+
     public abstract byte[] assemble();
 
     public abstract Message answer(int id);

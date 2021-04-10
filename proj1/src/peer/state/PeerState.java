@@ -7,6 +7,7 @@ import peer.messages.ReclaimReceiverMessage;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Set;
 
 public class PeerState {
     private static final int UNLIMITED_STORAGE = -1;
@@ -101,7 +102,7 @@ public class PeerState {
         this.files.add(file);
     }
 
-    public void insertReplicationDegreeOnFileChunk(String fileId, int chunkNo, int perceivedReplicationDegree) {
+    public void insertReplicationDegreeOnFileChunk(String fileId, int chunkNo, Set<Integer> perceivedReplicationDegree) {
         for (BackedUpFile file : this.files) {
             if (file.correspondsTo(fileId)) {
                 file.putChunk(chunkNo, perceivedReplicationDegree);
@@ -138,10 +139,26 @@ public class PeerState {
         return false;
     }
 
-    public void peerHasChunk(String fileId, int chunkNo, int peerId) {
+    public void peerAddedChunk(String fileId, int chunkNo, int peerId) {
         for (BackedUpChunk chunk : this.chunks) {
             if (chunk.correspondsTo(fileId, chunkNo)) {
-                chunk.peerHasChunk(peerId);
+                chunk.peerAddedChunk(peerId);
+                break;
+            }
+        }
+    }
+
+    public void peerRemovedChunk(String fileId, int chunkNo, int peerId) {
+        for (BackedUpFile file : this.files) {
+            if (file.correspondsTo(fileId)) {
+                file.peerRemovedChunk(chunkNo, peerId);
+                break; // TODO: should i return here?
+            }
+        }
+
+        for (BackedUpChunk chunk : this.chunks) {
+            if (chunk.correspondsTo(fileId, chunkNo)) {
+                chunk.peerRemovedChunk(peerId);
                 break;
             }
         }

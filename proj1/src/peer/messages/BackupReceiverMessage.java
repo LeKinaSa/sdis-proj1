@@ -29,7 +29,7 @@ public class BackupReceiverMessage extends Message {
 
     @Override
     public Message answer(int id) {
-        PeerState.INSTANCE.peerHasChunk(this.fileId, this.chunkNo, this.messagePeerId);
+        PeerState.INSTANCE.peerAddedChunk(this.fileId, this.chunkNo, this.messagePeerId);
         return null;
     }
 

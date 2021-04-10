@@ -2,12 +2,13 @@ package peer.state;
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Set;
 
 public class BackedUpFile {
     private final String pathname;
     private final String fileId;
     private final int desiredReplicationDegree;
-    private final Map<Integer, Integer> perceivedReplicationDegreePerChunk;
+    private final Map<Integer, Set<Integer>> perceivedReplicationDegreePerChunk;
 
     BackedUpFile(String pathname, String fileId, int replicationDegree) {
         this.pathname = pathname;
@@ -20,16 +21,13 @@ public class BackedUpFile {
         return this.fileId.equals(fileId);
     }
 
-    public void putChunk(int chunkNo, int perceivedReplicationDegree) {
+    public void putChunk(int chunkNo, Set<Integer> perceivedReplicationDegree) {
         this.perceivedReplicationDegreePerChunk.remove(chunkNo);
         this.perceivedReplicationDegreePerChunk.put(chunkNo, perceivedReplicationDegree);
     }
 
-    public int checkChunk(int chunkNo) {
-        if (this.perceivedReplicationDegreePerChunk.containsKey(chunkNo)) {
-            return this.perceivedReplicationDegreePerChunk.get(chunkNo);
-        }
-        return -1;
+    public void peerRemovedChunk(int chunkNo, int peerId) {
+        this.perceivedReplicationDegreePerChunk.get(chunkNo).remove(peerId);
     }
 
     public String toString() {
@@ -38,7 +36,7 @@ public class BackedUpFile {
         fileState += "\tFile: " + this.fileId + "\n";
         fileState += "\tRepl: " + this.desiredReplicationDegree + "\n";
         for (int chunk : this.perceivedReplicationDegreePerChunk.keySet()) {
-            fileState += "\t\tChunk " + chunk + ": " + this.perceivedReplicationDegreePerChunk.get(chunk) + "\n";
+            fileState += "\t\tChunk " + chunk + ": " + this.perceivedReplicationDegreePerChunk.get(chunk).size() + "\n";
         }
         return fileState;
     }

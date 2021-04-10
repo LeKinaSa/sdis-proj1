@@ -8,6 +8,8 @@ import java.io.IOException;
 import java.net.DatagramPacket;
 import java.net.MulticastSocket;
 import java.util.Arrays;
+import java.util.HashSet;
+import java.util.Set;
 
 public class ClientEndpoint implements ServerCommands { // Peer endpoint that the client reaches out
     private final int REPETITIONS = 5;
@@ -100,7 +102,7 @@ public class ClientEndpoint implements ServerCommands { // Peer endpoint that th
 
         // Read Answers from MC channel
         int timeInterval = 1000; // 1 second
-        int answers = 0;
+        Set<Integer> answers = new HashSet<>();
         byte[] buf = new byte[Message.MESSAGE_SIZE];
         DatagramPacket p = new DatagramPacket(buf, buf.length);
         for (int n = 0; n < this.REPETITIONS; n ++) {
@@ -109,21 +111,21 @@ public class ClientEndpoint implements ServerCommands { // Peer endpoint that th
             // Obtain answers during timeInterval
             long initial_timestamp = System.currentTimeMillis();
             long current_timestamp = System.currentTimeMillis();
-            answers = 0;
+            answers.clear();
             while (current_timestamp < initial_timestamp + timeInterval) {
                 try {
                     socket.setSoTimeout((int) (initial_timestamp + timeInterval - current_timestamp));
                     socket.receive(p);
                     Message answer = Message.parse(mc, mdb, mdr, p);
                     if ((answer instanceof BackupReceiverMessage) && (((BackupReceiverMessage) answer).correspondsTo(fileId, chunkNo))) {
-                        answers ++;
+                        answers.add(answer.getPeerId());
                     }
                 }
                 catch (IOException ignored) { }
                 current_timestamp = System.currentTimeMillis();
             }
 
-            if (answers >= replicationDegree) {
+            if (answers.size() >= replicationDegree) {
                 break;
             }
             timeInterval = timeInterval * 2;
