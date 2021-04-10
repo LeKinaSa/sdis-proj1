@@ -1,7 +1,5 @@
 package peer.state;
 
-import peer.PeerDebugger;
-
 import java.util.ArrayList;
 import java.util.List;
 
@@ -89,6 +87,16 @@ public class PeerState {
         for (BackedUpChunk chunk : this.chunks) {
             if (chunk.correspondsTo(fileId, chunkNo)) {
                 chunk.peerHasChunk(peerId);
+                break;
+            }
+        }
+    }
+
+    public void removeChunk(String fileId, int chunkNo) {
+        for (BackedUpChunk chunk : this.chunks) {
+            if (chunk.correspondsTo(fileId, chunkNo)) {
+                this.currentCapacity = this.currentCapacity - chunk.getSize();
+                this.chunks.remove(chunk);
                 break;
             }
         }
