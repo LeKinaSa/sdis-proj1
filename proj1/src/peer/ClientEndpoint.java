@@ -36,6 +36,8 @@ public class ClientEndpoint implements ServerCommands { // Peer endpoint that th
         int toBackUp;
         int chunk = 0;
 
+        String fileId = ""; // TODO: get fileId
+        PeerState.INSTANCE.insertFile(fileName, fileId, replicationDegree);
         while (backedUp < fileSize) {
             toBackUp = Math.min(Message.CHUNK_SIZE, fileSize - backedUp);
 

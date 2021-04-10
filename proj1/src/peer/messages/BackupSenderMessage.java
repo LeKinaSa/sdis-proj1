@@ -4,6 +4,7 @@ import peer.Channel;
 import peer.ChannelName;
 import peer.PeerDebugger;
 import peer.Utils;
+import peer.state.PeerState;
 
 import java.nio.charset.StandardCharsets;
 
@@ -49,6 +50,8 @@ public class BackupSenderMessage extends Message {
                     PeerDebugger.println("Error when storing " + this.fileId + " chunk " + this.chunkNo);
                     return;
                 }
+                // If this peer didn't have this chunk, insert it on peer state
+                PeerState.INSTANCE.insertChunk(this.fileId, this.chunkNo, this.chunkContent.length, this.replicationDegree);
             }
             // Delay from [0, 400[ ms
             Utils.pause(Utils.getRandomNumber(0, 401));

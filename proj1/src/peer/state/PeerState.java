@@ -34,17 +34,29 @@ public class PeerState {
         // TODO: may be used by reclaim protocol
     }
 
-    public void insertFile(BackedUpFile file) {
+    public void insertFile(String pathname, String fileId, int replicationDegree) {
+        // TODO: verify that this file isn't already in the system ?
+        BackedUpFile file = new BackedUpFile(pathname, fileId, replicationDegree);
         this.files.add(file);
     }
 
-    public boolean insertChunk(BackedUpChunk chunk) {
+    public boolean insertChunk(String fileId, int chunkNo, int size, int replicationDegree) {
+        BackedUpChunk chunk = new BackedUpChunk(fileId, chunkNo, size, replicationDegree);
         if (this.fits(chunk.getSize())) {
             this.chunks.add(chunk);
             currentCapacity = currentCapacity + chunk.getSize();
             return true;
         }
         return false;
+    }
+
+    public void peerHasChunk(String fileId, int chunkNo, int peerId) {
+        for (BackedUpChunk chunk : this.chunks) {
+            if (chunk.correspondsTo(fileId, chunkNo)) {
+                chunk.peerHasChunk(peerId);
+                break;
+            }
+        }
     }
 
     public String toString() {
