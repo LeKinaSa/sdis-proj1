@@ -89,6 +89,24 @@ public class PeerState {
         }
     }
 
+    public boolean chunkWithSufficientReplication(String fileId, int chunkNo) {
+        for (BackedUpChunk chunk : this.chunks) {
+            if (chunk.correspondsTo(fileId, chunkNo)) {
+                return chunk.hasSufficientReplication();
+            }
+        }
+        return true;
+    }
+
+    public int getReplicationDegreeForChunk(String fileId, int chunkNo) {
+        for (BackedUpChunk chunk : this.chunks) {
+            if (chunk.correspondsTo(fileId, chunkNo)) {
+                return chunk.getDesiredReplicationDegree();
+            }
+        }
+        return 0;
+    }
+
     public void insertFile(String pathname, String fileId, int replicationDegree) {
         for (BackedUpFile file : this.files) {
             if (file.correspondsTo(fileId)) {

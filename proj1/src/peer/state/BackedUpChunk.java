@@ -30,6 +30,10 @@ public class BackedUpChunk {
         return this.size;
     }
 
+    public int getDesiredReplicationDegree() {
+        return this.desiredReplicationDegree;
+    }
+
     public void peerAddedChunk(int peerId) {
         this.perceivedReplicationDegree.add(peerId);
     }
@@ -48,6 +52,10 @@ public class BackedUpChunk {
 
     public boolean canBeRemovedSafely() {
         return this.perceivedReplicationDegree.size() > this.desiredReplicationDegree;
+    }
+
+    public boolean hasSufficientReplication() {
+        return this.perceivedReplicationDegree.size() >= this.desiredReplicationDegree;
     }
 
     public String toString() {

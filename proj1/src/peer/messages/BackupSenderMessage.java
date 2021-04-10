@@ -66,4 +66,8 @@ public class BackupSenderMessage extends Message {
         thread.start();
         return null;
     }
+
+    public boolean correspondsTo(String fileId, int chunkNo) {
+        return this.fileId.equals(fileId) && (this.chunkNo == chunkNo);
+    }
 }

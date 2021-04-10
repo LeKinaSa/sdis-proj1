@@ -6,7 +6,7 @@
 # Compiled code is placed under ./build/
 # Modify it if needed to suite your purpose
 
-javac -cp .:gson-2.8.6.jar peer/*.java peer/clientCommands/*.java peer/messages/*.java peer/state/*.java -d ../out
+javac -cp .:./gson-2.8.6.jar peer/*.java peer/clientCommands/*.java peer/messages/*.java peer/state/*.java -d ../out
 
 # If you are using jar files, and these must be in some particular
 #  place under the build tree, you should copy/move those jar files.
