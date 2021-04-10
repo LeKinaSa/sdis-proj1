@@ -118,14 +118,6 @@ public class PeerState {
         this.files.add(file);
     }
 
-    public void insertReplicationDegreeOnFileChunk(String fileId, int chunkNo, Set<Integer> perceivedReplicationDegree) {
-        for (BackedUpFile file : this.files) {
-            if (file.correspondsTo(fileId)) {
-                file.putChunk(chunkNo, perceivedReplicationDegree);
-            }
-        }
-    }
-
     public void removeFile(String fileId) {
         for (BackedUpFile file : this.files) {
             if (file.correspondsTo(fileId)) {
@@ -145,8 +137,20 @@ public class PeerState {
         }
     }
 
+    public boolean hasFile(String fileId) {
+        for (BackedUpFile file : this.files) {
+            if (file.correspondsTo(fileId)) {
+                return true;
+            }
+        }
+        return false;
+    }
+
     public boolean insertChunk(String fileId, int chunkNo, int size, int replicationDegree) {
         BackedUpChunk chunk = new BackedUpChunk(fileId, chunkNo, size, replicationDegree);
+        if (this.hasFile(fileId)) {
+            return false;
+        }
         if (this.fits(chunk.getSize())) {
             this.chunks.add(chunk);
             currentCapacity = currentCapacity + chunk.getSize();
@@ -159,23 +163,29 @@ public class PeerState {
         for (BackedUpChunk chunk : this.chunks) {
             if (chunk.correspondsTo(fileId, chunkNo)) {
                 chunk.peerAddedChunk(peerId);
-                break;
+                return;
+            }
+        }
+        for (BackedUpFile file : this.files) {
+            if (file.correspondsTo(fileId)) {
+                file.putChunk(chunkNo, peerId);
+                return;
             }
         }
     }
 
     public void peerRemovedChunk(String fileId, int chunkNo, int peerId) {
-        for (BackedUpFile file : this.files) {
-            if (file.correspondsTo(fileId)) {
-                file.peerRemovedChunk(chunkNo, peerId);
-                break; // TODO: should i return here?
-            }
-        }
-
         for (BackedUpChunk chunk : this.chunks) {
             if (chunk.correspondsTo(fileId, chunkNo)) {
                 chunk.peerRemovedChunk(peerId);
-                break;
+                return;
+            }
+        }
+
+        for (BackedUpFile file : this.files) {
+            if (file.correspondsTo(fileId)) {
+                file.peerRemovedChunk(chunkNo, peerId);
+                return;
             }
         }
     }

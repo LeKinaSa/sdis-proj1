@@ -85,64 +85,19 @@ public class ClientEndpoint implements ServerCommands { // Peer endpoint that th
         // Get Message
         Message message = new BackupSenderMessage(this.mc, this.mdb, this.mdr, this.version, this.peerId, fileId, chunkNo, replicationDegree, chunkContent);
 
-        // Open MC Socket
-        MulticastSocket socket;
-        try {
-            socket = new MulticastSocket(mc.port);
-        }
-        catch (IOException exception) {
-            PeerDebugger.println("Error occurred");
-            return;
-        }
-        try {
-            socket.joinGroup(mc.ip);
-        }
-        catch (IOException exception) {
-            PeerDebugger.println("Error occurred: " + exception.getMessage());
-            socket.close();
-            return;
-        }
-
-        // Read Answers from MC channel
+        // Read Answers from MC channel (on the MC thread)
         int timeInterval = 1000; // 1 second
-        Set<Integer> answers = new HashSet<>();
-        byte[] buf = new byte[Message.MESSAGE_SIZE];
-        DatagramPacket p = new DatagramPacket(buf, buf.length);
         for (int n = 0; n < this.REPETITIONS; n ++) {
             // Send Message
             Utils.sendMessage(message);
-            // Obtain answers during timeInterval
-            long initial_timestamp = System.currentTimeMillis();
-            long current_timestamp = System.currentTimeMillis();
-            answers.clear();
-            while (current_timestamp < initial_timestamp + timeInterval) {
-                try {
-                    socket.setSoTimeout((int) (initial_timestamp + timeInterval - current_timestamp));
-                    socket.receive(p);
-                    Message answer = Message.parse(mc, mdb, mdr, p);
-                    if ((answer instanceof BackupReceiverMessage) && (((BackupReceiverMessage) answer).correspondsTo(fileId, chunkNo))) {
-                        answers.add(answer.getPeerId());
-                    }
-                }
-                catch (IOException ignored) { }
-                current_timestamp = System.currentTimeMillis();
-            }
-
-            if (answers.size() >= replicationDegree) {
-                break;
+            // Obtain answers during timeInterval (not here)
+            Utils.pause(timeInterval);
+            // If replication degree is enough, stop
+            if (ClientEndpoint.state.chunkWithSufficientReplication(fileId, chunkNo)) {
+                return;
             }
             timeInterval = timeInterval * 2;
         }
-
-        // Add perceivedReplicationDegree to peer state
-        ClientEndpoint.state.insertReplicationDegreeOnFileChunk(fileId, chunkNo, answers);
-
-        // Close Socket
-        try {
-            socket.leaveGroup(mc.ip);
-        }
-        catch (Exception ignored) { }
-        socket.close();
     }
 
     public byte[] restoreFile(String fileName) {

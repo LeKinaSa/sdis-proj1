@@ -1,7 +1,6 @@
 package peer.messages;
 
 import peer.*;
-import peer.state.PeerState;
 
 import java.nio.charset.StandardCharsets;
 

@@ -1,6 +1,7 @@
 package peer.state;
 
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 
@@ -21,9 +22,11 @@ public class BackedUpFile {
         return this.fileId.equals(fileId);
     }
 
-    public void putChunk(int chunkNo, Set<Integer> perceivedReplicationDegree) {
-        this.perceivedReplicationDegreePerChunk.remove(chunkNo);
-        this.perceivedReplicationDegreePerChunk.put(chunkNo, perceivedReplicationDegree);
+    public void putChunk(int chunkNo, int peerId) {
+        if (!this.perceivedReplicationDegreePerChunk.containsKey(chunkNo)) {
+            this.perceivedReplicationDegreePerChunk.put(chunkNo, new HashSet<>());
+        }
+        this.perceivedReplicationDegreePerChunk.get(chunkNo).add(peerId);
     }
 
     public void peerRemovedChunk(int chunkNo, int peerId) {

@@ -4,7 +4,6 @@ import peer.Channel;
 import peer.ChannelName;
 import peer.ClientEndpoint;
 import peer.Utils;
-import peer.state.PeerState;
 
 public class DeleteSenderMessage extends Message {
     private final String fileId;

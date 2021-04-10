@@ -3,7 +3,6 @@ package peer.messages;
 import peer.Channel;
 import peer.ChannelName;
 import peer.ClientEndpoint;
-import peer.state.PeerState;
 
 public class BackupReceiverMessage extends Message {
     private final String fileId;
