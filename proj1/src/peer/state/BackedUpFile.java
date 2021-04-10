@@ -4,10 +4,10 @@ import java.util.HashMap;
 import java.util.Map;
 
 public class BackedUpFile {
-    String pathname;
-    String fileId;
-    int desiredReplicationDegree;
-    Map<Integer, Integer> perceivedReplicationDegreePerChunk;
+    private final String pathname;
+    private final String fileId;
+    private final int desiredReplicationDegree;
+    private final Map<Integer, Integer> perceivedReplicationDegreePerChunk;
 
     BackedUpFile(String pathname, String fileId, int replicationDegree) {
         this.pathname = pathname;
@@ -17,9 +17,7 @@ public class BackedUpFile {
     }
 
     public void putChunk(int chunkNo, int perceivedReplicationDegree) {
-        if (this.perceivedReplicationDegreePerChunk.containsKey(chunkNo)) {
-            this.perceivedReplicationDegreePerChunk.remove(chunkNo);
-        }
+        this.perceivedReplicationDegreePerChunk.remove(chunkNo);
         this.perceivedReplicationDegreePerChunk.put(chunkNo, perceivedReplicationDegree);
     }
 

@@ -1,10 +1,10 @@
 package peer.state;
 
 public class BackedUpChunk {
-    private String fileId;
-    private int chunkNo;
-    private int size; // TODO: im storing in Bytes but the project specification says KBytes)
-    private int desiredReplicationDegree;
+    private final String fileId;
+    private final int chunkNo;
+    private final int size; // TODO: im storing in Bytes but the project specification says KBytes)
+    private final int desiredReplicationDegree;
     private int perceivedReplicationDegree;
 
     public BackedUpChunk(String fileId, int chunkNo, int size, int desiredReplicationDegree) {

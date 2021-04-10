@@ -67,9 +67,7 @@ public class Utils {
                     // Create the file
                     fileReady = file.createNewFile();
                 }
-                catch (IOException exception) {
-                    fileReady = false;
-                }
+                catch (IOException ignored) { }
             }
         }
         else if (directory.isDirectory()) {
@@ -77,9 +75,7 @@ public class Utils {
                 // Create the file
                 fileReady = file.createNewFile();
             }
-            catch (IOException exception) {
-                fileReady = false;
-            }
+            catch (IOException ignored) { }
         }
 
         if (fileReady) {
@@ -120,8 +116,11 @@ public class Utils {
         File file = new File("../peer-data/" + id + "/" + fileId);
         if (file.exists()) {
             // Remove all the files inside the folder
-            for (File f : file.listFiles()) {
-                f.delete();
+            File[] files = file.listFiles();
+            if (files != null) {
+                for (File f : files) {
+                    f.delete();
+                }
             }
             // Remove the entire folder
             file.delete();

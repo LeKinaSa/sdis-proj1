@@ -8,9 +8,9 @@ import java.net.InetAddress;
 import java.net.MulticastSocket;
 
 public class ListenerThread extends Thread {
-    private int id;
-    private ChannelName name;
-    private Channel mc, mdb, mdr;
+    private final int id;
+    private final ChannelName name;
+    private final Channel mc, mdb, mdr;
     
     public ListenerThread(int id, ChannelName name, Channel mc, Channel mdb, Channel mdr) {
         this.id = id;

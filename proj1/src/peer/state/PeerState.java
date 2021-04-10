@@ -8,8 +8,8 @@ public class PeerState {
 
     public static final PeerState INSTANCE = new PeerState(); // TODO: is this the best way to go, or is this a bad cut?
 
-    private List<BackedUpFile> files;
-    private List<BackedUpChunk> chunks;
+    private final List<BackedUpFile> files;
+    private final List<BackedUpChunk> chunks;
     private int currentCapacity; // TODO: im storing in Bytes but the project specification says KBytes)
     private int storageCapacity; // TODO: im storing in Bytes but the project specification says KBytes)
 
