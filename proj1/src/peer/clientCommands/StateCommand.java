@@ -16,7 +16,7 @@ public class StateCommand extends ClientCommand {
         System.out.println("Executing state...");
         try {
             String response = stub.state();
-            System.out.println("response: " + response);
+            System.out.println(response);
         } catch (Exception e) {
             System.err.println("Client exception: " + e.toString());
             e.printStackTrace();

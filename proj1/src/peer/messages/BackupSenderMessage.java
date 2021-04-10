@@ -4,6 +4,7 @@ import peer.Channel;
 import peer.ChannelName;
 import peer.PeerDebugger;
 import peer.Utils;
+import peer.state.PeerState;
 
 import java.nio.charset.StandardCharsets;
 
@@ -44,8 +45,16 @@ public class BackupSenderMessage extends Message {
         // New Thread to deal with the answer
         Thread thread = new Thread(() -> {
             if (!Utils.fileExists(id, this.fileId, this.chunkNo)) {
+
+                // If this peer didn't have this chunk, insert it on peer state
+                if (!PeerState.INSTANCE.insertChunk(this.fileId, this.chunkNo, this.chunkContent.length, this.replicationDegree)) {
+                    // If it doesn't fit, return
+                    return;
+                }
                 // Store the chunk (if the chunk isn't already stored in this peer)
                 if (!Utils.store(id, this.fileId, this.chunkNo, this.chunkContent)) {
+                    // An error has occurred while storing, remove the chunk from the peer state
+                    PeerState.INSTANCE.removeChunk(this.fileId, this.chunkNo);
                     PeerDebugger.println("Error when storing " + this.fileId + " chunk " + this.chunkNo);
                     return;
                 }

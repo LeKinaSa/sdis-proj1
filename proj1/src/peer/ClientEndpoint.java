@@ -8,6 +8,8 @@ import java.io.IOException;
 import java.net.DatagramPacket;
 import java.net.MulticastSocket;
 import java.util.Arrays;
+import java.util.HashSet;
+import java.util.Set;
 
 public class ClientEndpoint implements ServerCommands { // Peer endpoint that the client reaches out
     private final int REPETITIONS = 5;
@@ -28,6 +30,26 @@ public class ClientEndpoint implements ServerCommands { // Peer endpoint that th
         this.mdr = mdr;
     }
 
+    public Channel getMC() {
+        return this.mc;
+    }
+
+    public Channel getMDB() {
+        return this.mdb;
+    }
+
+    public Channel getMDR() {
+        return this.mdr;
+    }
+
+    public String getVersion() {
+        return this.version;
+    }
+
+    public int getId() {
+        return this.peerId;
+    }
+
     public void backupFile(String fileName, byte[] fileContents, int replicationDegree) {
         PeerDebugger.println("backupFile()");
 
@@ -36,11 +58,13 @@ public class ClientEndpoint implements ServerCommands { // Peer endpoint that th
         int toBackUp;
         int chunk = 0;
 
+        String fileId = fileName; // TODO: get fileId from fileName
+        PeerState.INSTANCE.insertFile(fileName, fileId, replicationDegree);
         while (backedUp < fileSize) {
             toBackUp = Math.min(Message.CHUNK_SIZE, fileSize - backedUp);
 
             // Backup Chunk [backedUp, backedUp + toBackUp[
-            backupChunk(Arrays.copyOfRange(fileContents, backedUp, backedUp + toBackUp), replicationDegree, fileName, chunk);
+            backupChunk(Arrays.copyOfRange(fileContents, backedUp, backedUp + toBackUp), replicationDegree, fileId, chunk);
             backedUp += toBackUp;
             chunk += 1;
         }
@@ -48,7 +72,7 @@ public class ClientEndpoint implements ServerCommands { // Peer endpoint that th
         // File size is a multiple of the chunk size
         if (fileSize % Message.CHUNK_SIZE == 0) {
             // Backup Chunk with size 0
-            backupChunk(new byte[0], replicationDegree, fileName, chunk);
+            backupChunk(new byte[0], replicationDegree, fileId, chunk);
         }
     }
 
@@ -78,7 +102,7 @@ public class ClientEndpoint implements ServerCommands { // Peer endpoint that th
 
         // Read Answers from MC channel
         int timeInterval = 1000; // 1 second
-        int answers;
+        Set<Integer> answers = new HashSet<>();
         byte[] buf = new byte[Message.MESSAGE_SIZE];
         DatagramPacket p = new DatagramPacket(buf, buf.length);
         for (int n = 0; n < this.REPETITIONS; n ++) {
@@ -87,25 +111,29 @@ public class ClientEndpoint implements ServerCommands { // Peer endpoint that th
             // Obtain answers during timeInterval
             long initial_timestamp = System.currentTimeMillis();
             long current_timestamp = System.currentTimeMillis();
-            answers = 0;
+            answers.clear();
             while (current_timestamp < initial_timestamp + timeInterval) {
                 try {
                     socket.setSoTimeout((int) (initial_timestamp + timeInterval - current_timestamp));
                     socket.receive(p);
                     Message answer = Message.parse(mc, mdb, mdr, p);
                     if ((answer instanceof BackupReceiverMessage) && (((BackupReceiverMessage) answer).correspondsTo(fileId, chunkNo))) {
-                        answers ++;
+                        answers.add(answer.getPeerId());
                     }
                 }
                 catch (IOException ignored) { }
                 current_timestamp = System.currentTimeMillis();
             }
 
-            if (answers >= replicationDegree) {
+            if (answers.size() >= replicationDegree) {
                 break;
             }
             timeInterval = timeInterval * 2;
         }
+
+        // Add perceivedReplicationDegree to peer state
+        PeerState.INSTANCE.insertReplicationDegreeOnFileChunk(fileId, chunkNo, answers);
+
         // Close Socket
         try {
             socket.leaveGroup(mc.ip);
@@ -193,7 +221,8 @@ public class ClientEndpoint implements ServerCommands { // Peer endpoint that th
 
     public void reclaimSpace(int space) {
         PeerDebugger.println("reclaimSpace()");
-        //TODO: implement
+        // space is in KBytes and the capacity in peer state is in Bytes
+        PeerState.INSTANCE.readjustCapacity(this, space * 1000, this.REPETITIONS);
     }
 
     public String state() {

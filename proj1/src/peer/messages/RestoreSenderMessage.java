@@ -83,7 +83,6 @@ public class RestoreSenderMessage extends Message {
                 }
                 catch (SocketTimeoutException exception) {
                     // The time expired and no message was received
-                    answerReceived = false;
                 }
                 catch (IOException ignored) { }
                 current_timestamp = System.currentTimeMillis();

@@ -10,6 +10,7 @@ import java.net.DatagramPacket;
 import java.net.DatagramSocket;
 import java.net.InetAddress;
 import java.net.SocketException;
+import java.util.Arrays;
 import java.util.Random;
 import java.util.concurrent.TimeUnit;
 
@@ -66,9 +67,7 @@ public class Utils {
                     // Create the file
                     fileReady = file.createNewFile();
                 }
-                catch (IOException exception) {
-                    fileReady = false;
-                }
+                catch (IOException ignored) { }
             }
         }
         else if (directory.isDirectory()) {
@@ -76,9 +75,7 @@ public class Utils {
                 // Create the file
                 fileReady = file.createNewFile();
             }
-            catch (IOException exception) {
-                fileReady = false;
-            }
+            catch (IOException ignored) { }
         }
 
         if (fileReady) {
@@ -106,9 +103,9 @@ public class Utils {
             try {
                 // Load information from inside the file
                 FileInputStream stream = new FileInputStream("../peer-data/" + id + "/" + fileId + "/" + chunkNo);
-                stream.read(buf);
+                int readSize = stream.read(buf);
                 stream.close();
-                return buf;
+                return Arrays.copyOfRange(buf, 0, readSize);
             }
             catch (IOException ignored) { }
         }
@@ -119,8 +116,11 @@ public class Utils {
         File file = new File("../peer-data/" + id + "/" + fileId);
         if (file.exists()) {
             // Remove all the files inside the folder
-            for (File f : file.listFiles()) {
-                f.delete();
+            File[] files = file.listFiles();
+            if (files != null) {
+                for (File f : files) {
+                    f.delete();
+                }
             }
             // Remove the entire folder
             file.delete();

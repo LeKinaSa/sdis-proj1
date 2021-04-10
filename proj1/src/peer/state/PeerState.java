@@ -1,17 +1,23 @@
 package peer.state;
 
+import peer.ClientEndpoint;
+import peer.Utils;
+import peer.messages.Message;
+import peer.messages.ReclaimReceiverMessage;
+
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Set;
 
 public class PeerState {
     private static final int UNLIMITED_STORAGE = -1;
 
     public static final PeerState INSTANCE = new PeerState(); // TODO: is this the best way to go, or is this a bad cut?
 
-    private List<BackedUpFile> files;
-    private List<BackedUpChunk> chunks;
-    private int currentCapacity; // TODO: im storing in Bytes but the project specification says KBytes)
-    private int storageCapacity; // TODO: im storing in Bytes but the project specification says KBytes)
+    private final List<BackedUpFile> files;
+    private final List<BackedUpChunk> chunks;
+    private int currentCapacity; // TODO: im storing in Bytes but the project specification says KBytes
+    private int storageCapacity; // TODO: im storing in Bytes but the project specification says KBytes
 
     public PeerState() {
         this.files = new ArrayList<>();
@@ -26,21 +32,150 @@ public class PeerState {
         return this.storageCapacity >= this.currentCapacity + size;
     }
 
-    public void readjustCapacity(int newStorageCapacity) {
-        // TODO: may be used by reclaim protocol
+    public boolean storageIsStable() {
+        return this.currentCapacity <= this.storageCapacity;
     }
 
-    public void insertFile(BackedUpFile file) {
+    public void readjustCapacity(ClientEndpoint peer, int newStorageCapacity, int repetitions) {
+        this.storageCapacity = newStorageCapacity;
+        if (this.storageIsStable()) {
+            return;
+        }
+
+        // Separate All Chunks in Safe and Unsafe for Removal
+        List<BackedUpChunk> safeRemoves = new ArrayList<>();
+        List<BackedUpChunk> unsafeRemoves = new ArrayList<>();
+        for (BackedUpChunk chunk : this.chunks) {
+            if (chunk.canBeRemovedSafely()) {
+                safeRemoves.add(chunk);
+            }
+            else {
+                unsafeRemoves.add(chunk);
+            }
+        }
+
+        // Firstly, Remove the Safe Chunks
+        for (BackedUpChunk safeRemove : safeRemoves) {
+            // Remove the Chunk
+            this.removeChunkFromPeerStorage(safeRemove);
+            // Alert the Other Peers
+            this.alertOtherPeersOfChunkDeletion(peer, safeRemove, repetitions);
+            // Verify if More Removals are Needed
+            if (this.storageIsStable()) {
+                return;
+            }
+        }
+
+        // Then, Remove the Other Ones (since the peer is still out of storage space)
+        for (BackedUpChunk unsafeRemove : unsafeRemoves) {
+            // Remove the Chunk
+            this.removeChunkFromPeerStorage(unsafeRemove);
+            // Alert the Other Peers
+            this.alertOtherPeersOfChunkDeletion(peer, unsafeRemove, repetitions);
+            // Verify if More Removals are Needed
+            if (this.storageIsStable()) {
+                return;
+            }
+        }
+    }
+
+    public void alertOtherPeersOfChunkDeletion(ClientEndpoint peer, BackedUpChunk chunk, int repetitions) {
+        final int delay = 50;
+        Message message = new ReclaimReceiverMessage(peer.getMC(), peer.getMDB(), peer.getMDR(), peer.getVersion(), peer.getId(), chunk.getFileId(), chunk.getChunkNo());
+
+        // Send Message
+        Utils.sendMessage(message);
+        for (int n = 0; n < repetitions - 1; n ++) {
+            Utils.pause(delay);
+            Utils.sendMessage(message);
+        }
+    }
+
+    public void insertFile(String pathname, String fileId, int replicationDegree) {
+        for (BackedUpFile file : this.files) {
+            if (file.correspondsTo(fileId)) {
+                // TODO: file was already found - do i have to do something with this info
+                return;
+            }
+        }
+        BackedUpFile file = new BackedUpFile(pathname, fileId, replicationDegree);
         this.files.add(file);
     }
 
-    public boolean insertChunk(BackedUpChunk chunk) {
+    public void insertReplicationDegreeOnFileChunk(String fileId, int chunkNo, Set<Integer> perceivedReplicationDegree) {
+        for (BackedUpFile file : this.files) {
+            if (file.correspondsTo(fileId)) {
+                file.putChunk(chunkNo, perceivedReplicationDegree);
+            }
+        }
+    }
+
+    public void removeFile(String fileId) {
+        for (BackedUpFile file : this.files) {
+            if (file.correspondsTo(fileId)) {
+                this.files.remove(file);
+                break;
+            }
+        }
+
+        List<BackedUpChunk> removedChunks = new ArrayList<>();
+        for (BackedUpChunk chunk : this.chunks) {
+            if (chunk.belongsTo(fileId)) {
+                removedChunks.add(chunk);
+            }
+        }
+        for (BackedUpChunk chunk : removedChunks) {
+            this.removeChunkFromPeerStorage(chunk);
+        }
+    }
+
+    public boolean insertChunk(String fileId, int chunkNo, int size, int replicationDegree) {
+        BackedUpChunk chunk = new BackedUpChunk(fileId, chunkNo, size, replicationDegree);
         if (this.fits(chunk.getSize())) {
             this.chunks.add(chunk);
             currentCapacity = currentCapacity + chunk.getSize();
             return true;
         }
         return false;
+    }
+
+    public void peerAddedChunk(String fileId, int chunkNo, int peerId) {
+        for (BackedUpChunk chunk : this.chunks) {
+            if (chunk.correspondsTo(fileId, chunkNo)) {
+                chunk.peerAddedChunk(peerId);
+                break;
+            }
+        }
+    }
+
+    public void peerRemovedChunk(String fileId, int chunkNo, int peerId) {
+        for (BackedUpFile file : this.files) {
+            if (file.correspondsTo(fileId)) {
+                file.peerRemovedChunk(chunkNo, peerId);
+                break; // TODO: should i return here?
+            }
+        }
+
+        for (BackedUpChunk chunk : this.chunks) {
+            if (chunk.correspondsTo(fileId, chunkNo)) {
+                chunk.peerRemovedChunk(peerId);
+                break;
+            }
+        }
+    }
+
+    public void removeChunk(String fileId, int chunkNo) {
+        for (BackedUpChunk chunk : this.chunks) {
+            if (chunk.correspondsTo(fileId, chunkNo)) {
+                this.removeChunkFromPeerStorage(chunk);
+                break;
+            }
+        }
+    }
+
+    public void removeChunkFromPeerStorage(BackedUpChunk chunk) {
+        this.currentCapacity = this.currentCapacity - chunk.getSize();
+        this.chunks.remove(chunk);
     }
 
     public String toString() {

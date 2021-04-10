@@ -2,6 +2,7 @@ package peer.messages;
 
 import peer.Channel;
 import peer.ChannelName;
+import peer.state.PeerState;
 
 public class ReclaimReceiverMessage extends Message {
     private final String fileId;
@@ -28,6 +29,7 @@ public class ReclaimReceiverMessage extends Message {
 
     @Override
     public Message answer(int id) {
+        PeerState.INSTANCE.peerRemovedChunk(this.fileId, this.chunkNo, this.messagePeerId);
         // TODO
         return null;
     }

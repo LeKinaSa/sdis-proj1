@@ -75,6 +75,9 @@ public abstract class Message {
 
     public static Message parse(Channel mc, Channel mdb, Channel mdr, DatagramPacket packet) {
         byte[] separator = getSeparator();
+        if (separator == null) {
+            return null;
+        }
         int index = Utils.indexOf(packet.getData(), separator);
         String header = new String(packet.getData(), 0, index);
         Matcher matcher = HEADER_PATTERN.matcher(header);
@@ -131,7 +134,10 @@ public abstract class Message {
                     } catch (NumberFormatException exception) {
                         return null;
                     }
-                    byte[] body = Arrays.copyOfRange(packet.getData(), index + separator.length, packet.getLength());
+                    byte[] body = new byte[0];
+                    if ((index + separator.length) != packet.getLength()) {
+                        body = Arrays.copyOfRange(packet.getData(), index + separator.length, packet.getLength());
+                    }
                     return new RestoreReceiverMessage(mc, mdb, mdr, version, senderId, fileId, chunkNo, body);
                 }
                 case "DELETE": {
@@ -179,6 +185,10 @@ public abstract class Message {
             default:
                 return 0;
         }
+    }
+
+    public int getPeerId() {
+        return this.messagePeerId;
     }
 
     public abstract byte[] assemble();
