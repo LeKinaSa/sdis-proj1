@@ -144,28 +144,4 @@ public class Utils {
         // TODO: do i need to flush?
         socket.close();
     }
-
-    public static PeerState loadState(int peerId) {
-        PeerState state = null;
-        File peerStateFile = new File("../peer-data/" + peerId + "/state.json");
-        if (peerStateFile.exists()) {
-            try (BufferedReader reader = new BufferedReader(new InputStreamReader(new FileInputStream(peerStateFile), StandardCharsets.UTF_8))) {
-                state = PeerState.gson.fromJson(reader, PeerState.class);
-            } catch(Exception ignored) { }
-        }
-        if (state == null) {
-            state = new PeerState();
-        }
-        return state;
-    }
-    public void saveState(int peerId) {
-        File peerStateFile = new File("../peer-data/" + peerId + "/state.json");
-        try {
-            peerStateFile.createNewFile();
-            try (BufferedWriter writer = new BufferedWriter(new OutputStreamWriter(new FileOutputStream(peerStateFile), StandardCharsets.UTF_8))) {
-                writer.write(PeerState.gson.toJson(ClientEndpoint.state));
-            }
-        }
-        catch (IOException ignored) { }
-    }
 }
