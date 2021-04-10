@@ -11,5 +11,5 @@ except FileNotFoundError:
     pass
 
 directories = ["peer", "peer/clientCommands"]
-
+print(" ".join(["javac"] + list(map(lambda x : x + "/*.java", directories)) + ["-d", "../out"]))
 subprocess.check_call(" ".join(["javac"] + list(map(lambda x : x + "/*.java", directories)) + ["-d", "../out"]), shell=True)
