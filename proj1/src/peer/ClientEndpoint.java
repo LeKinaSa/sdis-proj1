@@ -28,6 +28,26 @@ public class ClientEndpoint implements ServerCommands { // Peer endpoint that th
         this.mdr = mdr;
     }
 
+    public Channel getMC() {
+        return this.mc;
+    }
+
+    public Channel getMDB() {
+        return this.mdb;
+    }
+
+    public Channel getMDR() {
+        return this.mdr;
+    }
+
+    public String getVersion() {
+        return this.version;
+    }
+
+    public int getId() {
+        return this.peerId;
+    }
+
     public void backupFile(String fileName, byte[] fileContents, int replicationDegree) {
         PeerDebugger.println("backupFile()");
 
@@ -200,7 +220,7 @@ public class ClientEndpoint implements ServerCommands { // Peer endpoint that th
     public void reclaimSpace(int space) {
         PeerDebugger.println("reclaimSpace()");
         // space is in KBytes and the capacity in peer state is in Bytes
-        PeerState.INSTANCE.readjustCapacity(space * 1000);
+        PeerState.INSTANCE.readjustCapacity(this, space * 1000, this.REPETITIONS);
     }
 
     public String state() {

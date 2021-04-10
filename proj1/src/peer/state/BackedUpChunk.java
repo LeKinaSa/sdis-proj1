@@ -19,6 +19,14 @@ public class BackedUpChunk {
         this.perceivedReplicationDegree = new HashSet<>();
     }
 
+    public String getFileId() {
+        return this.fileId;
+    }
+
+    public int getChunkNo() {
+        return this.chunkNo;
+    }
+
     public int getSize() {
         return this.size;
     }

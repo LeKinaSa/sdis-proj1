@@ -1,5 +1,10 @@
 package peer.state;
 
+import peer.ClientEndpoint;
+import peer.Utils;
+import peer.messages.Message;
+import peer.messages.ReclaimReceiverMessage;
+
 import java.util.ArrayList;
 import java.util.List;
 
@@ -30,7 +35,7 @@ public class PeerState {
         return this.currentCapacity <= this.storageCapacity;
     }
 
-    public void readjustCapacity(int newStorageCapacity) {
+    public void readjustCapacity(ClientEndpoint peer, int newStorageCapacity, int repetitions) {
         this.storageCapacity = newStorageCapacity;
         if (this.storageIsStable()) {
             return;
@@ -53,7 +58,7 @@ public class PeerState {
             // Remove the Chunk
             this.removeChunkFromPeerStorage(safeRemove);
             // Alert the Other Peers
-            // TODO: Alert other peers
+            this.alertOtherPeersOfChunkDeletion(peer, safeRemove, repetitions);
             // Verify if More Removals are Needed
             if (this.storageIsStable()) {
                 return;
@@ -65,11 +70,23 @@ public class PeerState {
             // Remove the Chunk
             this.removeChunkFromPeerStorage(unsafeRemove);
             // Alert the Other Peers
-            // TODO: Alert other peers
+            this.alertOtherPeersOfChunkDeletion(peer, unsafeRemove, repetitions);
             // Verify if More Removals are Needed
             if (this.storageIsStable()) {
                 return;
             }
+        }
+    }
+
+    public void alertOtherPeersOfChunkDeletion(ClientEndpoint peer, BackedUpChunk chunk, int repetitions) {
+        final int delay = 50;
+        Message message = new ReclaimReceiverMessage(peer.getMC(), peer.getMDB(), peer.getMDR(), peer.getVersion(), peer.getId(), chunk.getFileId(), chunk.getChunkNo());
+
+        // Send Message
+        Utils.sendMessage(message);
+        for (int n = 0; n < repetitions - 1; n ++) {
+            Utils.pause(delay);
+            Utils.sendMessage(message);
         }
     }
 
