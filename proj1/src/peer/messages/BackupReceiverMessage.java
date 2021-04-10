@@ -2,6 +2,7 @@ package peer.messages;
 
 import peer.Channel;
 import peer.ChannelName;
+import peer.ClientEndpoint;
 import peer.state.PeerState;
 
 public class BackupReceiverMessage extends Message {
@@ -29,7 +30,7 @@ public class BackupReceiverMessage extends Message {
 
     @Override
     public Message answer(int id) {
-        PeerState.INSTANCE.peerAddedChunk(this.fileId, this.chunkNo, this.messagePeerId);
+        ClientEndpoint.state.peerAddedChunk(this.fileId, this.chunkNo, this.messagePeerId);
         return null;
     }
 

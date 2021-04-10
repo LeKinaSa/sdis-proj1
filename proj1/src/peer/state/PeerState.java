@@ -12,8 +12,6 @@ import java.util.Set;
 public class PeerState {
     private static final int UNLIMITED_STORAGE = -1;
 
-    public static final PeerState INSTANCE = new PeerState(); // TODO: is this the best way to go, or is this a bad cut?
-
     private final List<BackedUpFile> files;
     private final List<BackedUpChunk> chunks;
     private int currentCapacity; // TODO: im storing in Bytes but the project specification says KBytes

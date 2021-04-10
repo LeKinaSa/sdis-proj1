@@ -3,8 +3,7 @@ package peer;
 import peer.messages.*;
 import peer.state.PeerState;
 
-import java.io.ByteArrayOutputStream;
-import java.io.IOException;
+import java.io.*;
 import java.net.DatagramPacket;
 import java.net.MulticastSocket;
 import java.util.Arrays;
@@ -12,6 +11,8 @@ import java.util.HashSet;
 import java.util.Set;
 
 public class ClientEndpoint implements ServerCommands { // Peer endpoint that the client reaches out
+    public static PeerState state;
+
     private final int REPETITIONS = 5;
     private Channel mc, mdb, mdr;
     private final String version;
@@ -59,7 +60,7 @@ public class ClientEndpoint implements ServerCommands { // Peer endpoint that th
         int chunk = 0;
 
         String fileId = fileName; // TODO: get fileId from fileName
-        PeerState.INSTANCE.insertFile(fileName, fileId, replicationDegree);
+        ClientEndpoint.state.insertFile(fileName, fileId, replicationDegree);
         while (backedUp < fileSize) {
             toBackUp = Math.min(Message.CHUNK_SIZE, fileSize - backedUp);
 
@@ -132,7 +133,7 @@ public class ClientEndpoint implements ServerCommands { // Peer endpoint that th
         }
 
         // Add perceivedReplicationDegree to peer state
-        PeerState.INSTANCE.insertReplicationDegreeOnFileChunk(fileId, chunkNo, answers);
+        ClientEndpoint.state.insertReplicationDegreeOnFileChunk(fileId, chunkNo, answers);
 
         // Close Socket
         try {
@@ -222,11 +223,11 @@ public class ClientEndpoint implements ServerCommands { // Peer endpoint that th
     public void reclaimSpace(int space) {
         PeerDebugger.println("reclaimSpace()");
         // space is in KBytes and the capacity in peer state is in Bytes
-        PeerState.INSTANCE.readjustCapacity(this, space * 1000, this.REPETITIONS);
+        ClientEndpoint.state.readjustCapacity(this, space * 1000, this.REPETITIONS);
     }
 
     public String state() {
         PeerDebugger.println("state()");
-        return PeerState.INSTANCE.toString();
+        return ClientEndpoint.state.toString();
     }
 }

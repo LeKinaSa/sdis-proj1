@@ -2,6 +2,7 @@ package peer.messages;
 
 import peer.Channel;
 import peer.ChannelName;
+import peer.ClientEndpoint;
 import peer.Utils;
 import peer.state.PeerState;
 
@@ -33,7 +34,7 @@ public class DeleteSenderMessage extends Message {
             // Delete all chunks from this file stored in this peer
             Utils.deleteFile(id, this.fileId);
             // Remove all chunks from this file from the peer state
-            PeerState.INSTANCE.removeFile(this.fileId);
+            ClientEndpoint.state.removeFile(this.fileId);
         });
         thread.start();
         return null;
