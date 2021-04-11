@@ -196,8 +196,6 @@ public class Utils {
             autoSave.shutdownNow();
         }
         autoSave = Executors.newSingleThreadScheduledExecutor();
-        autoSave.scheduleAtFixedRate(() -> {
-            Utils.saveState(peerId);
-        }, 0, delay, TimeUnit.SECONDS);
+        autoSave.scheduleAtFixedRate(() -> Utils.saveState(peerId), 0, delay, TimeUnit.SECONDS);
     }
 }

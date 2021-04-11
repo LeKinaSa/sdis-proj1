@@ -32,8 +32,4 @@ public class BackupReceiverMessage extends Message {
         ClientEndpoint.state.peerAddedChunk(this.fileId, this.chunkNo, this.messagePeerId);
         return null;
     }
-
-    public boolean correspondsTo(String fileId, int chunkNo) {
-        return this.fileId.equals(fileId) && (this.chunkNo == chunkNo);
-    }
 }

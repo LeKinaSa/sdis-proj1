@@ -7,7 +7,6 @@ import peer.messages.ReclaimReceiverMessage;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Set;
 
 public class PeerState {
     private static final int UNLIMITED_STORAGE = -1;
