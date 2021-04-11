@@ -27,6 +27,6 @@ public class DeleteReceiverMessage extends Message {
 
     @Override
     public void answer(int id) {
-        ClientEndpoint.state.fileRemovedFromPeer(this.fileId, id);
+        ClientEndpoint.state.fileRemovedFromPeer(this.fileId, this.messagePeerId);
     }
 }

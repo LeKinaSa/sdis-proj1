@@ -35,6 +35,11 @@ public class DeleteTargetMessage extends Message {
             Utils.deleteFile(id, this.fileId);
             // Remove all chunks from this file from the peer state
             ClientEndpoint.state.removeFile(this.fileId);
+
+            // Message from this peer (id)
+            Message message = new DeleteReceiverMessage(this.mc, this.mdb, this.mdr, this.version, id, this.fileId);
+            // Send Message
+            Utils.sendMessage(message);
         }
     }
 }
