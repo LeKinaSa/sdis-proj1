@@ -42,4 +42,8 @@ public class DeleteTargetMessage extends Message {
             Utils.sendMessage(message);
         }
     }
+
+    public boolean correspondsTo(String fileId, int targetPeerId) {
+        return this.fileId.equals(fileId) && (this.targetPeerId == targetPeerId);
+    }
 }

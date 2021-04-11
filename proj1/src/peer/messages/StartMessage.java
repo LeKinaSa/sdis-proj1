@@ -1,10 +1,11 @@
 package peer.messages;
 
-import peer.Channel;
-import peer.ChannelName;
-import peer.ClientEndpoint;
-import peer.Utils;
+import peer.*;
 
+import java.io.IOException;
+import java.net.DatagramPacket;
+import java.net.MulticastSocket;
+import java.net.SocketTimeoutException;
 import java.util.Set;
 
 public class StartMessage extends Message {
@@ -32,13 +33,66 @@ public class StartMessage extends Message {
         Thread thread = new Thread(() -> {
             Set<String> files = ClientEndpoint.state.removedFilesFromPeer(this.messagePeerId);
             Message message;
+            // Open MC Socket
+            MulticastSocket socket;
+            try {
+                socket = new MulticastSocket(this.mc.port);
+            }
+            catch (IOException exception) {
+                PeerDebugger.println("Error occurred");
+                return;
+            }
+            try {
+                socket.joinGroup(this.mc.ip);
+            }
+            catch (IOException exception) {
+                PeerDebugger.println("Error occurred: " + exception.getMessage());
+                socket.close();
+                return;
+            }
+
             for (String fileId : files) {
                 message = new DeleteTargetMessage(this.mc, this.mdb, this.mdr, this.version, id, fileId, this.messagePeerId);
-                for (int n = 0; n < ClientEndpoint.REPETITIONS; n ++) {
-                    Utils.pause(Utils.getRandomNumber(0, 401));
+
+                // Verify if no other peer is faster to send the delete target message
+                byte[] buf = new byte[Message.MESSAGE_SIZE];
+                DatagramPacket p = new DatagramPacket(buf, buf.length);
+                long initial_timestamp = System.currentTimeMillis();
+                long current_timestamp = System.currentTimeMillis();
+                int timeToWait = Utils.getRandomNumber(0, 401);
+                boolean answerReceived = false;
+                while (current_timestamp < initial_timestamp + timeToWait) {
+                    try {
+                        socket.setSoTimeout((int) (initial_timestamp + timeToWait - current_timestamp));
+                        socket.receive(p);
+                        Message answer = Message.parse(mc, mdb, mdr, p);
+                        if ((answer instanceof DeleteTargetMessage) && (((DeleteTargetMessage) answer).correspondsTo(fileId, this.messagePeerId))) {
+                            answerReceived = true;
+                            break;
+                        }
+                    }
+                    catch (SocketTimeoutException exception) {
+                        // The time expired and no message was received
+                    }
+                    catch (IOException ignored) { }
+                    current_timestamp = System.currentTimeMillis();
+                }
+
+                // Send chunk if needed
+                if (!answerReceived) {
                     Utils.sendMessage(message);
+                    for (int n = 0; n < ClientEndpoint.REPETITIONS - 1; n ++) {
+                        Utils.pause(Utils.getRandomNumber(0, 401));
+                        Utils.sendMessage(message);
+                    }
                 }
             }
+            // Close MDR Socket
+            try {
+                socket.leaveGroup(this.mdr.ip);
+            }
+            catch (Exception ignored) { }
+            socket.close();
         });
         thread.start();
     }
