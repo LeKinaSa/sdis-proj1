@@ -1,5 +1,7 @@
 package peer.clientCommands;
 
+import java.io.FileOutputStream;
+
 public class RestoreCommand extends ClientCommand {
     private final String file;
 
@@ -19,7 +21,12 @@ public class RestoreCommand extends ClientCommand {
         System.out.println("Executing restore...");
         try {
             byte[] fileBytes = stub.restoreFile(this.file);
-            System.out.println("File Restored: " + new String(fileBytes)); // TODO: what do i do with these bytes
+            // System.out.println("File Restored: " + new String(fileBytes));
+
+            try (FileOutputStream fos = new FileOutputStream(this.file)) {
+                fos.write(fileBytes);
+            }
+
         } catch (Exception e) {
             System.err.println("Client exception: " + e.toString());
             e.printStackTrace();
