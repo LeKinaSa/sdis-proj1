@@ -43,7 +43,6 @@ public class BackupSenderMessage extends Message {
         // New Thread to deal with the answer
         Thread thread = new Thread(() -> {
             if (!Utils.fileExists(id, this.fileId, this.chunkNo)) {
-
                 // If this peer didn't have this chunk, insert it on peer state
                 if (!ClientEndpoint.state.insertChunk(this.fileId, this.chunkNo, this.chunkContent.length, this.replicationDegree)) {
                     // If it doesn't fit, return
@@ -60,6 +59,16 @@ public class BackupSenderMessage extends Message {
             // Delay from [0, 400[ ms
             Utils.pause(Utils.getRandomNumber(0, 401));
 
+            if (!this.version.equals("1.0")) {
+                // When the replication degree was already acquired, there is no need to store this chunk
+                if (ClientEndpoint.state.chunkWithSufficientReplication(this.fileId, this.chunkNo)) {
+                    // Delete the chunk from this peer storage
+                    Utils.deleteChunk(id, this.fileId, this.chunkNo);
+                    // Remove the chunk from the peer state
+                    ClientEndpoint.state.removeChunk(this.fileId, this.chunkNo);
+                    return;
+                }
+            }
             // Send Message: BackupReceiverMessage (with this peer id not the id on the received message)
             Message answer = new BackupReceiverMessage(this.mc, this.mdb, this.mdr, this.version, id, this.fileId, this.chunkNo);
             Utils.sendMessage(answer);
