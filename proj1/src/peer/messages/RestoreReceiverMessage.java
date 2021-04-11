@@ -3,8 +3,6 @@ package peer.messages;
 import peer.Channel;
 import peer.ChannelName;
 
-import java.nio.charset.StandardCharsets;
-
 public class RestoreReceiverMessage extends Message {
     private final String fileId;
     private final int chunkNo;
@@ -18,8 +16,7 @@ public class RestoreReceiverMessage extends Message {
     }
 
     public String toString() {
-        String content = new String(chunkContent, StandardCharsets.UTF_8);
-        return "[peer" + this.messagePeerId + "] v" + this.version + " - Restore " + this.fileId + ":" + this.chunkNo + "::" + content;
+        return "[peer" + this.messagePeerId + "] v" + this.version + " - Restore " + this.fileId + ":" + this.chunkNo + ":: chunk size " + this.chunkContent.length;
     }
 
     @Override

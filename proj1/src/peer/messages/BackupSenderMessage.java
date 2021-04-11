@@ -2,8 +2,6 @@ package peer.messages;
 
 import peer.*;
 
-import java.nio.charset.StandardCharsets;
-
 public class BackupSenderMessage extends Message {
     private final String fileId;
     private final int chunkNo;
@@ -19,8 +17,7 @@ public class BackupSenderMessage extends Message {
     }
 
     public String toString() {
-        String content = new String(chunkContent, StandardCharsets.UTF_8);
-        return "[peer" + this.messagePeerId + "] v" + this.version + " - Backup initiator " + this.fileId + ":" + this.chunkNo + " x" + replicationDegree + "::" + content;
+        return "[peer" + this.messagePeerId + "] v" + this.version + " - Backup initiator " + this.fileId + ":" + this.chunkNo + " x" + replicationDegree + ":: chunk size " + this.chunkContent.length;
     }
 
     @Override
