@@ -1,5 +1,5 @@
 # java peer.Server 1.0 1 Hello 230.0.0.0:4446 230.0.0.0:4445 230.0.0.0:4444
-
+import build # This import is here to run the file
 
 import subprocess, pathlib, os, atexit, sys, time
 
