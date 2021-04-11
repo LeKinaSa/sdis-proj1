@@ -1,5 +1,8 @@
 package peer;
 
+import peer.messages.Message;
+import peer.messages.StartMessage;
+
 import java.net.UnknownHostException;
 import java.rmi.registry.Registry;
 import java.rmi.registry.LocateRegistry;
@@ -78,6 +81,8 @@ public class Server {
         // TODO: do we need this thread ??? everything that is sent to this channel is an answer to RestoreSender
 
         // --------------- Server is Ready ---------------
+        Message message = new StartMessage(mc, mdb, mdr, version, id);
+        Utils.sendMessage(message);
         PeerDebugger.println("Server ready");
     }
 

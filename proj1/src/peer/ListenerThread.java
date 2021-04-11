@@ -8,6 +8,7 @@ import java.net.InetAddress;
 import java.net.MulticastSocket;
 
 public class ListenerThread extends Thread {
+    public static boolean STOP;
     private final int id;
     private final ChannelName name;
     private final Channel mc, mdb, mdr;
@@ -18,6 +19,7 @@ public class ListenerThread extends Thread {
         this.mc = mc;
         this.mdb = mdb;
         this.mdr = mdr;
+        STOP = false;
     }
 
     public void run() {
@@ -44,8 +46,7 @@ public class ListenerThread extends Thread {
         // Read messages
         byte[] buf = new byte[Message.MESSAGE_SIZE];
         DatagramPacket p = new DatagramPacket(buf, buf.length);
-        int x = 1;
-        while (x == 1) { // TODO: non infinite loop
+        while (!STOP) {
             // Obtain Packet
             try {
                 socket.receive(p);

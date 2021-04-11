@@ -17,8 +17,7 @@ public abstract class Message {
     public static final int MESSAGE_SIZE = 65000;
     // This size tries to guarantee that the full message will be read from the socket
 
-    // TODO: should i add (.*) at the end of the pattern to support different headers
-    private static final Pattern HEADER_PATTERN = Pattern.compile("(?<version>[0-9]\\.[0-9]) +(?<type>PUTCHUNK|STORED|GETCHUNK|CHUNK|DELETE|REMOVED|DELETED) +(?<senderId>[0-9]+) +((?<fileId>.*\\..*?) +)?((?<chunkNo>[0-9]+) +)?((?<replication>[0-9]+) +)?");
+    private static final Pattern HEADER_PATTERN = Pattern.compile("(?<version>[0-9]\\.[0-9]) +(?<type>PUTCHUNK|STORED|GETCHUNK|CHUNK|DELETE|REMOVED|DELETED|REMOVE|START|STOP) +(?<senderId>[0-9]+) +((?<fileId>.*\\..*?) +)?((?<chunkNo>[0-9]+) +)?((?<replication>[0-9]+) +)?(.*)");
     private static final String CRLF = "\r\n"; // 0xD 0xA
 
     private final ChannelName channel;
@@ -101,7 +100,8 @@ public abstract class Message {
                     try {
                         chunkNo = Integer.parseInt(matcher.group("chunkNo"));
                         replication = Integer.parseInt(matcher.group("replication"));
-                    } catch (NumberFormatException exception) {
+                    }
+                    catch (NumberFormatException exception) {
                         return null;
                     }
                     byte[] body = Arrays.copyOfRange(packet.getData(), index + separator.length, packet.getLength());
@@ -112,7 +112,8 @@ public abstract class Message {
                     int chunkNo;
                     try {
                         chunkNo = Integer.parseInt(matcher.group("chunkNo"));
-                    } catch (NumberFormatException exception) {
+                    }
+                    catch (NumberFormatException exception) {
                         return null;
                     }
                     return new BackupReceiverMessage(mc, mdb, mdr, version, senderId, fileId, chunkNo);
@@ -122,7 +123,8 @@ public abstract class Message {
                     int chunkNo;
                     try {
                         chunkNo = Integer.parseInt(matcher.group("chunkNo"));
-                    } catch (NumberFormatException exception) {
+                    }
+                    catch (NumberFormatException exception) {
                         return null;
                     }
                     return new RestoreSenderMessage(mc, mdb, mdr, version, senderId, fileId, chunkNo);
@@ -132,7 +134,8 @@ public abstract class Message {
                     int chunkNo;
                     try {
                         chunkNo = Integer.parseInt(matcher.group("chunkNo"));
-                    } catch (NumberFormatException exception) {
+                    }
+                    catch (NumberFormatException exception) {
                         return null;
                     }
                     byte[] body = new byte[0];
@@ -150,7 +153,8 @@ public abstract class Message {
                     int chunkNo;
                     try {
                         chunkNo = Integer.parseInt(matcher.group("chunkNo"));
-                    } catch (NumberFormatException exception) {
+                    }
+                    catch (NumberFormatException exception) {
                         return null;
                     }
                     return new ReclaimReceiverMessage(mc, mdb, mdr, version, senderId, fileId, chunkNo);
@@ -158,6 +162,23 @@ public abstract class Message {
                 case "DELETED": {
                     String fileId = matcher.group("fileId");
                     return new DeleteReceiverMessage(mc, mdb, mdr, version, senderId, fileId);
+                }
+                case "REMOVE": {
+                    String fileId = matcher.group("fileId");
+                    int targetPeerId; // targetPeerId is stored on the chunkNo field
+                    try {
+                        targetPeerId = Integer.parseInt(matcher.group("chunkNo"));
+                    }
+                    catch (NumberFormatException exception) {
+                        return null;
+                    }
+                    return new DeleteTargetMessage(mc, mdb, mdr, version, senderId, fileId, targetPeerId);
+                }
+                case "START": {
+                    return new StartMessage(mc, mdb, mdr, version, senderId);
+                }
+                case "STOP": {
+                    return new StopMessage(mc, mdb, mdr, version, senderId);
                 }
                 default:
                     return null;

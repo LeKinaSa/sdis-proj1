@@ -10,8 +10,8 @@ import java.util.Arrays;
 
 public class ClientEndpoint implements ServerCommands { // Peer endpoint that the client reaches out
     public static PeerState state;
+    public static final int REPETITIONS = 5;
 
-    private final int REPETITIONS = 5;
     private Channel mc, mdb, mdr;
     private final String version;
     private final int peerId;
@@ -85,7 +85,7 @@ public class ClientEndpoint implements ServerCommands { // Peer endpoint that th
 
         // Read Answers from MC channel (on the MC thread)
         int timeInterval = 1000; // 1 second
-        for (int n = 0; n < this.REPETITIONS; n ++) {
+        for (int n = 0; n < REPETITIONS; n ++) {
             // Send Message
             Utils.sendMessage(message);
             // Obtain answers during timeInterval (not here)
@@ -168,7 +168,7 @@ public class ClientEndpoint implements ServerCommands { // Peer endpoint that th
         Message message = new DeleteSenderMessage(this.mc, this.mdb, this.mdr, this.version, this.peerId, fileName);
         // Send message
         Utils.sendMessage(message);
-        for (int n = 0; n < this.REPETITIONS - 1; n ++) {
+        for (int n = 0; n < REPETITIONS - 1; n ++) {
             Utils.pause(Utils.getRandomNumber(0, 401));
             Utils.sendMessage(message);
         }
@@ -177,7 +177,7 @@ public class ClientEndpoint implements ServerCommands { // Peer endpoint that th
     public void reclaimSpace(int space) {
         PeerDebugger.println("reclaimSpace()");
         // space is in KBytes and the capacity in peer state is in Bytes
-        ClientEndpoint.state.readjustCapacity(this, space * 1000, this.REPETITIONS);
+        ClientEndpoint.state.readjustCapacity(this, space * 1000);
     }
 
     public String state() {

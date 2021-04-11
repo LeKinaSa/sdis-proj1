@@ -37,7 +37,7 @@ public class PeerState {
         return this.currentCapacity <= this.storageCapacity;
     }
 
-    public void readjustCapacity(ClientEndpoint peer, int newStorageCapacity, int repetitions) {
+    public void readjustCapacity(ClientEndpoint peer, int newStorageCapacity) {
         this.storageCapacity = newStorageCapacity;
         if (this.storageIsStable()) {
             return;
@@ -62,7 +62,7 @@ public class PeerState {
             // Remove the Chunk from the Peer Storage
             Utils.deleteChunk(peer.getId(), safeRemove.getFileId(), safeRemove.getChunkNo());
             // Alert the Other Peers
-            this.alertOtherPeersOfChunkDeletion(peer, safeRemove, repetitions);
+            this.alertOtherPeersOfChunkDeletion(peer, safeRemove);
             // Verify if More Removals are Needed
             if (this.storageIsStable()) {
                 return;
@@ -76,7 +76,7 @@ public class PeerState {
             // Remove the Chunk from the Peer Storage
             Utils.deleteChunk(peer.getId(), unsafeRemove.getFileId(), unsafeRemove.getChunkNo());
             // Alert the Other Peers
-            this.alertOtherPeersOfChunkDeletion(peer, unsafeRemove, repetitions);
+            this.alertOtherPeersOfChunkDeletion(peer, unsafeRemove);
             // Verify if More Removals are Needed
             if (this.storageIsStable()) {
                 return;
@@ -84,13 +84,13 @@ public class PeerState {
         }
     }
 
-    public void alertOtherPeersOfChunkDeletion(ClientEndpoint peer, BackedUpChunk chunk, int repetitions) {
+    public void alertOtherPeersOfChunkDeletion(ClientEndpoint peer, BackedUpChunk chunk) {
         final int delay = 50;
         Message message = new ReclaimReceiverMessage(peer.getMC(), peer.getMDB(), peer.getMDR(), peer.getVersion(), peer.getId(), chunk.getFileId(), chunk.getChunkNo());
 
         // Send Message
         Utils.sendMessage(message);
-        for (int n = 0; n < repetitions - 1; n ++) {
+        for (int n = 0; n < ClientEndpoint.REPETITIONS - 1; n ++) {
             Utils.pause(delay);
             Utils.sendMessage(message);
         }
@@ -289,5 +289,15 @@ public class PeerState {
                 return;
             }
         }
+    }
+
+    public Set<String> removedFilesFromPeer(int peerId) {
+        Set<String> fileIds = new HashSet<>();
+        for (RemovedFile file : this.removed) {
+            if (file.wasOnPeer(peerId)) {
+                fileIds.add(file.getFileId());
+            }
+        }
+        return fileIds;
     }
 }

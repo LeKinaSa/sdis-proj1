@@ -11,6 +11,10 @@ public class RemovedFile {
         this.peers = peers;
     }
 
+    public String getFileId() {
+        return this.fileId;
+    }
+
     public boolean correspondsTo(String fileId) {
         return this.fileId.equals(fileId);
     }
@@ -21,5 +25,9 @@ public class RemovedFile {
 
     public boolean fileHasBeenDeletedFromAllPeers() {
         return this.peers.size() == 0;
+    }
+
+    public boolean wasOnPeer(int peerId) {
+        return this.peers.contains(peerId);
     }
 }
