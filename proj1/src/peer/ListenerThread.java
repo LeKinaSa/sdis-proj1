@@ -64,10 +64,7 @@ public class ListenerThread extends Thread {
 
             // Execute the Necessary Action based on the Received Message
             PeerDebugger.println("Message received: " + message.toString());
-            Message answer = message.answer(this.id);
-            if (answer != null) {
-                Utils.sendMessage(answer);
-            }
+            message.answer(this.id);
         }
 
         // Close Socket
@@ -76,6 +73,9 @@ public class ListenerThread extends Thread {
         }
         catch (Exception ignored) { }
         socket.close();
+
+        // Save State
+        Utils.saveState(this.id);
     }
 
     private InetAddress getIp() {

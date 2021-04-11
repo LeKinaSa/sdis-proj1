@@ -28,8 +28,7 @@ public class BackupReceiverMessage extends Message {
     }
 
     @Override
-    public Message answer(int id) {
+    public void answer(int id) {
         ClientEndpoint.state.peerAddedChunk(this.fileId, this.chunkNo, this.messagePeerId);
-        return null;
     }
 }

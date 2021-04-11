@@ -31,12 +31,12 @@ public class ReclaimReceiverMessage extends Message {
     }
 
     @Override
-    public Message answer(int id) {
+    public void answer(int id) {
         // Remove the chunk from the peer state
         ClientEndpoint.state.peerRemovedChunk(this.fileId, this.chunkNo, this.messagePeerId);
         // Verify if the replication is still acceptable
         if (ClientEndpoint.state.chunkWithSufficientReplication(this.fileId, this.chunkNo)) {
-            return null;
+            return;
         }
         // The chunk replication has dropped below the desired replication degree
         // New Thread to send the new putchunk message
@@ -107,6 +107,5 @@ public class ReclaimReceiverMessage extends Message {
             socket.close();
         });
         thread.start();
-        return null;
     }
 }

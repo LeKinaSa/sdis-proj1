@@ -27,7 +27,7 @@ public class DeleteSenderMessage extends Message {
     }
 
     @Override
-    public Message answer(int id) {
+    public void answer(int id) {
         // New Thread to deal with the answer
         Thread thread = new Thread(() -> {
             // Delete all chunks from this file stored in this peer
@@ -36,6 +36,5 @@ public class DeleteSenderMessage extends Message {
             ClientEndpoint.state.removeFile(this.fileId);
         });
         thread.start();
-        return null;
     }
 }

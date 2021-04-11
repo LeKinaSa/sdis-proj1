@@ -33,9 +33,9 @@ public class BackupSenderMessage extends Message {
     }
 
     @Override
-    public Message answer(int id) {
+    public void answer(int id) {
         if (this.messagePeerId == id) {
-            return null;
+            return;
         }
 
         // New Thread to deal with the answer
@@ -63,7 +63,6 @@ public class BackupSenderMessage extends Message {
             Utils.sendMessage(answer);
         });
         thread.start();
-        return null;
     }
 
     public boolean correspondsTo(String fileId, int chunkNo) {

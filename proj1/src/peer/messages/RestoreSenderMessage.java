@@ -34,7 +34,7 @@ public class RestoreSenderMessage extends Message {
     }
 
     @Override
-    public Message answer(int id) {
+    public void answer(int id) {
         // New Thread to deal with the answer
         Thread thread = new Thread(() -> {
             // Search for the chunkContent
@@ -101,6 +101,5 @@ public class RestoreSenderMessage extends Message {
             socket.close();
         });
         thread.start();
-        return null;
     }
 }

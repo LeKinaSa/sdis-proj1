@@ -32,8 +32,8 @@ public class RestoreReceiverMessage extends Message {
     }
 
     @Override
-    public Message answer(int id) {
-        return null;
+    public void answer(int id) {
+        return;
     }
 
     public byte[] getChunk() {

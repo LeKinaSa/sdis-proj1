@@ -193,5 +193,5 @@ public abstract class Message {
 
     public abstract byte[] assemble();
 
-    public abstract Message answer(int id);
+    public abstract void answer(int id);
 }
