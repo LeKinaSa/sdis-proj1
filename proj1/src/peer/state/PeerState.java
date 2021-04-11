@@ -15,9 +15,9 @@ public class PeerState {
 
     private final List<BackedUpFile> files;
     private final List<BackedUpChunk> chunks;
+    private final List<RemovedFile> removed;
     private int currentCapacity; // Bytes
     private int storageCapacity; // Bytes
-    private List<RemovedFile> removed;
 
     public PeerState() {
         this.files = new ArrayList<>();
@@ -105,6 +105,24 @@ public class PeerState {
         return true;
     }
 
+    public void chunkClearReplication(String fileId, int chunkNo) {
+        for (BackedUpChunk chunk : this.chunks) {
+            if (chunk.correspondsTo(fileId, chunkNo)) {
+                chunk.clearReplication();
+                break;
+            }
+        }
+    }
+
+    public Set<Integer> chunkGetReplication(String fileId, int chunkNo) {
+        for (BackedUpChunk chunk : this.chunks) {
+            if (chunk.correspondsTo(fileId, chunkNo)) {
+                return chunk.backupAnswers();
+            }
+        }
+        return null;
+    }
+
     public int getReplicationDegreeForChunk(String fileId, int chunkNo) {
         for (BackedUpChunk chunk : this.chunks) {
             if (chunk.correspondsTo(fileId, chunkNo)) {
@@ -117,6 +135,7 @@ public class PeerState {
     public void insertFile(String pathname, String fileId, int replicationDegree) {
         for (BackedUpFile file : this.files) {
             if (file.correspondsTo(fileId)) {
+                // File Already Backed Up in the System
                 // TODO: file was already found - do i have to do something with this info
                 return;
             }
@@ -253,17 +272,13 @@ public class PeerState {
         Set<Integer> peers = new HashSet<>();
         for (BackedUpFile file : this.files) {
             if (file.correspondsTo(fileId)) {
-                for (int peer : file.getPeersThatBackedUpTheFile()) {
-                    peers.add(peer);
-                }
+                peers.addAll(file.getPeersThatBackedUpTheFile());
                 break;
             }
         }
         for (BackedUpChunk chunk : this.chunks) {
             if (chunk.belongsTo(fileId)) {
-                for (int peer : chunk.getPeersThatBackedUpTheChunk()) {
-                    peers.add(peer);
-                }
+                peers.addAll(chunk.getPeersThatBackedUpTheChunk());
             }
         }
 

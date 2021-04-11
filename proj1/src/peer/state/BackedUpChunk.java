@@ -34,6 +34,14 @@ public class BackedUpChunk {
         return this.desiredReplicationDegree;
     }
 
+    public void clearReplication() {
+        this.perceivedReplicationDegree.clear();
+    }
+
+    public Set<Integer> backupAnswers() {
+        return this.perceivedReplicationDegree;
+    }
+
     public void peerAddedChunk(int peerId) {
         this.perceivedReplicationDegree.add(peerId);
     }

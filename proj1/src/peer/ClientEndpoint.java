@@ -7,6 +7,8 @@ import java.io.*;
 import java.net.DatagramPacket;
 import java.net.MulticastSocket;
 import java.util.Arrays;
+import java.util.HashSet;
+import java.util.Set;
 
 public class ClientEndpoint implements ServerCommands { // Peer endpoint that the client reaches out
     public static PeerState state;
@@ -82,10 +84,13 @@ public class ClientEndpoint implements ServerCommands { // Peer endpoint that th
 
         // Get Message
         Message message = new BackupSenderMessage(this.mc, this.mdb, this.mdr, this.version, this.peerId, fileId, chunkNo, replicationDegree, chunkContent);
+        Set<Integer> previousAnswers = new HashSet<>();
+        Set<Integer> answers;
 
         // Read Answers from MC channel (on the MC thread)
         int timeInterval = 1000; // 1 second
         for (int n = 0; n < REPETITIONS; n ++) {
+            ClientEndpoint.state.chunkClearReplication(fileId, chunkNo);
             // Send Message
             Utils.sendMessage(message);
             // Obtain answers during timeInterval (not here)
@@ -93,6 +98,16 @@ public class ClientEndpoint implements ServerCommands { // Peer endpoint that th
             // If replication degree is enough, stop
             if (ClientEndpoint.state.chunkWithSufficientReplication(fileId, chunkNo)) {
                 return;
+            }
+            if (!this.version.equals("1.0")) {
+                answers = ClientEndpoint.state.chunkGetReplication(fileId, chunkNo);
+                if (answers != null) {
+                    // If the answers repeat, then it is likely that there is no more peers or no more peers with space
+                    if (answers.equals(previousAnswers)) {
+                        return;
+                    }
+                    previousAnswers = answers;
+                }
             }
             timeInterval = timeInterval * 2;
         }
