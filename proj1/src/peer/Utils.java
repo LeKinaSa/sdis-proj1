@@ -11,6 +11,8 @@ import java.net.SocketException;
 import java.nio.charset.StandardCharsets;
 import java.util.Arrays;
 import java.util.Random;
+import java.util.concurrent.Executors;
+import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
 
 import com.google.gson.Gson;
@@ -18,6 +20,7 @@ import com.google.gson.GsonBuilder;
 
 public class Utils {
     private static final Gson gson = new GsonBuilder().setPrettyPrinting().create();
+    private static ScheduledExecutorService autoSave;
 
     public static int getRandomNumber(int min, int max) {
         Random random = new Random();
@@ -86,9 +89,9 @@ public class Utils {
             // File has been created successfully
             try {
                 // Store information inside the file
-                FileOutputStream stream = new FileOutputStream("../peer-data/" + id + "/" + fileId + "/" + chunkNo);
-                stream.write(chunkContent);
-                stream.close();
+                try (FileOutputStream stream = new FileOutputStream("../peer-data/" + id + "/" + fileId + "/" + chunkNo)) {
+                    stream.write(chunkContent);
+                }
                 return true; // The information was stored successfully
             }
             catch (IOException ignored) { }
@@ -106,9 +109,10 @@ public class Utils {
             byte[] buf = new byte[Message.CHUNK_SIZE];
             try {
                 // Load information from inside the file
-                FileInputStream stream = new FileInputStream("../peer-data/" + id + "/" + fileId + "/" + chunkNo);
-                int readSize = stream.read(buf);
-                stream.close();
+                int readSize;
+                try (FileInputStream stream = new FileInputStream("../peer-data/" + id + "/" + fileId + "/" + chunkNo)) {
+                    readSize = stream.read(buf);
+                }
                 return Arrays.copyOfRange(buf, 0, readSize);
             }
             catch (IOException ignored) { }
@@ -166,7 +170,8 @@ public class Utils {
         if (peerStateFile.exists()) {
             try (BufferedReader reader = new BufferedReader(new InputStreamReader(new FileInputStream(peerStateFile), StandardCharsets.UTF_8))) {
                 state = Utils.gson.fromJson(reader, PeerState.class);
-            } catch(Exception ignored) { }
+            }
+            catch(Exception ignored) { }
         }
         if (state == null) {
             state = new PeerState();
@@ -186,6 +191,13 @@ public class Utils {
     }
 
     public static void scheduleSave(int peerId) {
-        // TODO: schedule periodic state save
+        final int delay = 20;
+        if ((autoSave != null) && (!autoSave.isShutdown())) {
+            autoSave.shutdownNow();
+        }
+        autoSave = Executors.newSingleThreadScheduledExecutor();
+        autoSave.scheduleAtFixedRate(() -> {
+            Utils.saveState(peerId);
+        }, 0, delay, TimeUnit.SECONDS);
     }
 }
