@@ -6,7 +6,7 @@ import java.util.Set;
 public class BackedUpChunk {
     private final String fileId;
     private final int chunkNo;
-    private final int size; // TODO: im storing in Bytes but the project specification says KBytes
+    private final int size; // Bytes
     private final int desiredReplicationDegree;
     private final Set<Integer> perceivedReplicationDegree;
 

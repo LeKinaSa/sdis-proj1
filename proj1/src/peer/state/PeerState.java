@@ -13,8 +13,8 @@ public class PeerState {
 
     private final List<BackedUpFile> files;
     private final List<BackedUpChunk> chunks;
-    private int currentCapacity; // TODO: im storing in Bytes but the project specification says KBytes
-    private int storageCapacity; // TODO: im storing in Bytes but the project specification says KBytes
+    private int currentCapacity; // Bytes
+    private int storageCapacity; // Bytes
 
     public PeerState() {
         this.files = new ArrayList<>();
@@ -219,8 +219,8 @@ public class PeerState {
     public String toString() {
         String peerState = "";
         peerState += "----------------------------------------\n";
-        peerState += "Current Capacity: " + this.currentCapacity + "\n";
-        peerState += "Storage Capacity: " + this.storageCapacity + "\n";
+        peerState += "Current Capacity: " + this.currentCapacity + " Bytes\n";
+        peerState += "Storage Capacity: " + this.storageCapacity + " Bytes\n";
         peerState += "----------------------------------------\n";
         peerState += "Files:\n";
         for (BackedUpFile file : this.files) {
