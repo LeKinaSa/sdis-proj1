@@ -207,6 +207,15 @@ public class PeerState {
         this.chunks.remove(chunk);
     }
 
+    public boolean hasChunk(String fileId, int chunkNo) {
+        for (BackedUpChunk chunk : this.chunks) {
+            if (chunk.correspondsTo(fileId, chunkNo)) {
+                return true;
+            }
+        }
+        return false;
+    }
+
     public String toString() {
         String peerState = "";
         peerState += "----------------------------------------\n";

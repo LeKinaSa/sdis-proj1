@@ -35,6 +35,11 @@ public class BackupSenderMessage extends Message {
     @Override
     public void answer(int id) {
         if (this.messagePeerId == id) {
+            if (ClientEndpoint.state.hasChunk(this.fileId, this.chunkNo)) {
+                // Send Message (ensure all the peers have the correct perceived chunk replication after reclaim protocol)
+                Message answer = new BackupReceiverMessage(this.mc, this.mdb, this.mdr, this.version, id, this.fileId, this.chunkNo);
+                Utils.sendMessage(answer);
+            }
             return;
         }
 
