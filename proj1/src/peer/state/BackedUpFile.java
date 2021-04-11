@@ -33,6 +33,16 @@ public class BackedUpFile {
         this.perceivedReplicationDegreePerChunk.get(chunkNo).remove(peerId);
     }
 
+    public Set<Integer> getPeersThatBackedUpTheFile() {
+        Set<Integer> peers = new HashSet<>();
+        for (int chunk : this.perceivedReplicationDegreePerChunk.keySet()) {
+            for (int peer : this.perceivedReplicationDegreePerChunk.get(chunk)) {
+                peers.add(peer);
+            }
+        }
+        return peers;
+    }
+
     public String toString() {
         String fileState = "";
         fileState += "\tPath: " + this.pathname + "\n";

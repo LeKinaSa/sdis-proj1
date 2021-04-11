@@ -6,7 +6,9 @@ import peer.messages.Message;
 import peer.messages.ReclaimReceiverMessage;
 
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 public class PeerState {
     private static final int UNLIMITED_STORAGE = -1;
@@ -15,11 +17,13 @@ public class PeerState {
     private final List<BackedUpChunk> chunks;
     private int currentCapacity; // Bytes
     private int storageCapacity; // Bytes
+    private List<RemovedFile> removed;
 
     public PeerState() {
         this.files = new ArrayList<>();
         this.chunks = new ArrayList<>();
         this.storageCapacity = PeerState.UNLIMITED_STORAGE;
+        this.removed = new ArrayList<>();
     }
 
     public boolean fits(int size) {
@@ -233,5 +237,48 @@ public class PeerState {
         }
         peerState += "----------------------------------------\n";
         return peerState;
+    }
+
+    public void fileIsBeingRemoved(String fileId) {
+        // Delete enhancement
+
+        // Collect the peer that have this file backed up
+        Set<Integer> peers = new HashSet<>();
+        for (BackedUpFile file : this.files) {
+            if (file.correspondsTo(fileId)) {
+                for (int peer : file.getPeersThatBackedUpTheFile()) {
+                    peers.add(peer);
+                }
+                break;
+            }
+        }
+        for (BackedUpChunk chunk : this.chunks) {
+            if (chunk.belongsTo(fileId)) {
+                for (int peer : chunk.getPeersThatBackedUpTheChunk()) {
+                    peers.add(peer);
+                }
+            }
+        }
+
+        // Add this file to the removed files
+        this.removed.add(new RemovedFile(fileId, peers));
+    }
+
+    public void fileRemovedFromPeer(String fileId, int peerId) {
+        // Delete enhancement
+
+        for (RemovedFile file : this.removed) {
+            if (file.correspondsTo(fileId)) {
+                // This Peer Has Deleted this File
+                file.peerHasDeletedFile(peerId);
+
+                // All Peer Storage has been Cleaned
+                if (file.fileHasBeenDeletedFromAllPeers()) {
+                    this.removed.remove(file);
+                }
+
+                return;
+            }
+        }
     }
 }

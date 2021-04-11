@@ -5,7 +5,7 @@ import java.rmi.registry.Registry;
 import java.rmi.registry.LocateRegistry;
 import java.net.InetAddress;
 import java.rmi.server.UnicastRemoteObject;
-        
+
 
 public class Server {
     private static InetAddress ip;
@@ -75,6 +75,7 @@ public class Server {
         mdbThread.start();
         Thread mdrThread = new ListenerThread(id, ChannelName.MDR, mc, mdb, mdr);
         mdrThread.start();
+        // TODO: do we need this thread ??? everything that is sent to this channel is an answer to RestoreSender
 
         // --------------- Server is Ready ---------------
         PeerDebugger.println("Server ready");

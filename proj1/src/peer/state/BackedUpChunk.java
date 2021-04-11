@@ -58,6 +58,10 @@ public class BackedUpChunk {
         return this.perceivedReplicationDegree.size() >= this.desiredReplicationDegree;
     }
 
+    public Set<Integer> getPeersThatBackedUpTheChunk() {
+        return this.perceivedReplicationDegree;
+    }
+
     public String toString() {
         String chunkState = "";
         chunkState += "\tFile: " + this.fileId + ":" + this.chunkNo + "\n";
