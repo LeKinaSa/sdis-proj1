@@ -17,6 +17,7 @@ import java.util.concurrent.TimeUnit;
 
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
+// TODO: is interoperability impacted by having the jar dependency? -> should we remove the gson dependency
 
 public class Utils {
     private static final Gson gson = new GsonBuilder().setPrettyPrinting().create();
