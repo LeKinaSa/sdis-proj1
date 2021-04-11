@@ -155,6 +155,10 @@ public abstract class Message {
                     }
                     return new ReclaimReceiverMessage(mc, mdb, mdr, version, senderId, fileId, chunkNo);
                 }
+                case "DELETED": {
+                    String fileId = matcher.group("fileId");
+                    return new DeleteReceiverMessage(mc, mdb, mdr, version, senderId, fileId);
+                }
                 default:
                     return null;
             }

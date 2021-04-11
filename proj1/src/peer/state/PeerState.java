@@ -242,7 +242,14 @@ public class PeerState {
     public void fileIsBeingRemoved(String fileId) {
         // Delete enhancement
 
-        // Collect the peer that have this file backed up
+        // Verify that the file isn't already stored in the removed files
+        for (RemovedFile file : this.removed) {
+            if (file.correspondsTo(fileId)) {
+                return;
+            }
+        }
+
+        // Collect the peers that have this file backed up
         Set<Integer> peers = new HashSet<>();
         for (BackedUpFile file : this.files) {
             if (file.correspondsTo(fileId)) {
@@ -261,7 +268,9 @@ public class PeerState {
         }
 
         // Add this file to the removed files
-        this.removed.add(new RemovedFile(fileId, peers));
+        if (peers.size() != 0) {
+            this.removed.add(new RemovedFile(fileId, peers));
+        }
     }
 
     public void fileRemovedFromPeer(String fileId, int peerId) {
