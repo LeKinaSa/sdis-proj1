@@ -45,9 +45,9 @@ public class BackedUpFile {
 
     public String toString() {
         String fileState = "";
-        fileState += "\tPath: " + this.pathname + "\n";
-        fileState += "\tFile: " + this.fileId + "\n";
-        fileState += "\tRepl: " + this.desiredReplicationDegree + "\n";
+        fileState += "\tFile: " + this.pathname + "\n";
+        fileState += "\tId  : " + this.fileId + "\n";
+        fileState += "\tReplication: " + this.desiredReplicationDegree + "\n";
         for (int chunk : this.perceivedReplicationDegreePerChunk.keySet()) {
             fileState += "\t\tChunk " + chunk + ": " + this.perceivedReplicationDegreePerChunk.get(chunk).size() + "\n";
         }
