@@ -253,15 +253,15 @@ public class PeerState {
         peerState.append("----------------------------------------\n");
         peerState.append("Files:\n");
         for (BackedUpFile file : this.files) {
-            peerState += file.toString();
+            peerState.append(file.toString());
         }
-        peerState += "----------------------------------------\n";
-        peerState += "Chunks:\n";
+        peerState.append("----------------------------------------\n");
+        peerState.append("Chunks:\n");
         for (BackedUpChunk chunk : this.chunks) {
-            peerState += chunk.toString();
+            peerState.append(chunk.toString());
         }
-        peerState += "----------------------------------------\n";
-        return peerState;
+        peerState.append("----------------------------------------\n");
+        return peerState.toString();
     }
 
     public void fileIsBeingRemoved(String fileId) {
