@@ -13,6 +13,8 @@ import java.util.Set;
 import java.util.regex.Pattern;
 
 public class PeerState {
+    // {files:[],chunks:[{fileId:-1147906284,chunkNo:0,size:8,desiredReplicationDegree:1,perceivedReplicationDegree:[2,3,4}],removed:[],currentCapacity:8,storageCapacity:-1}
+    // {files:[{pathname:test.txt,fileId:-1147906284,desiredReplicationDegree:1,perceivedReplicationDegreePerChunk:{0:[2,3,4]}}],chunks:[],removed:[],currentCapacity:0,storageCapacity:-1}
     private static final int UNLIMITED_STORAGE = -1;
 
     private final List<BackedUpFile> files;

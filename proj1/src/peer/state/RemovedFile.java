@@ -1,5 +1,7 @@
 package peer.state;
 
+import peer.PeerDebugger;
+
 import java.util.HashSet;
 import java.util.Set;
 
@@ -16,7 +18,7 @@ public class RemovedFile {
         String fileId = fileInfo.substring(fileInfo.indexOf(":") + 1, fileInfo.indexOf(","));
         Set<Integer> peers = new HashSet<>();
         String peersStr = fileInfo.substring(fileInfo.indexOf("[") + 1, fileInfo.indexOf("]"));
-        System.out.println(peersStr);
+        PeerDebugger.println(peersStr);
         String[] peersList = peersStr.split(",");
         for (String peer : peersList) {
             peers.add(Integer.parseInt(peer));

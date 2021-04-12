@@ -17,6 +17,27 @@ import java.util.concurrent.TimeUnit;
 public class Utils {
     private static ScheduledExecutorService autoSave;
 
+    public static int findClosingBracket(String text, int bracketPos, char opening, char closing) {
+        if (text.charAt(bracketPos) == opening) {
+            PeerDebugger.println("findClosingBracket is not starting in the right place");
+        }
+
+        int bracketCount = 1;
+
+        while (bracketCount != 0) {
+            bracketPos += 1;
+            if (text.charAt(bracketPos) == opening) {
+                bracketCount += 1;
+            }
+
+            if (text.charAt(bracketPos) == closing) {
+                bracketCount -= 1;
+            }
+        }
+
+        return bracketPos;
+    }
+
     public static int getRandomNumber(int min, int max) {
         Random random = new Random();
         return random.nextInt(max - min) + min;
