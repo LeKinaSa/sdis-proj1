@@ -39,6 +39,7 @@ public class BackedUpChunk {
         if (chunkInfo.lastIndexOf(",") == (chunkInfo.length() - 1)) {
             chunkInfo.deleteCharAt(chunkInfo.length() - 1);
         }
+        chunkInfo.append("]");
 
         chunkInfo.append("}");
         return chunkInfo.toString();

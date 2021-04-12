@@ -11,9 +11,9 @@ except FileNotFoundError:
     pass
 
 if sys.platform == 'win32':
-    command = "javac -cp \".;./gson-2.8.6.jar\" peer/*.java peer/clientCommands/*.java peer/messages/*.java peer/state/*.java -d ../out"
+    command = "javac peer/*.java peer/clientCommands/*.java peer/messages/*.java peer/state/*.java -d ../out"
 else:
-    command = "javac -cp \".:./gson-2.8.6.jar\" peer/*.java peer/clientCommands/*.java peer/messages/*.java peer/state/*.java -d ../out"
+    command = "javac peer/*.java peer/clientCommands/*.java peer/messages/*.java peer/state/*.java -d ../out"
 
 print(command)
 subprocess.check_call(command, shell=True)

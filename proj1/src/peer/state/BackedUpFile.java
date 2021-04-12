@@ -41,7 +41,6 @@ public class BackedUpFile {
             if (fileInfo.lastIndexOf(",") == (fileInfo.length() - 1)) {
                 fileInfo.deleteCharAt(fileInfo.length() - 1);
             }
-
             fileInfo.append("],");
         }
         if (fileInfo.lastIndexOf(",") == (fileInfo.length() - 1)) {

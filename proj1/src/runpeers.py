@@ -27,9 +27,9 @@ time.sleep(1)
 
 for i in range(npeers):
     if sys.platform == 'win32':
-        args = f"java -cp \".;../src/gson-2.8.6.jar\" peer.Server 1.0 {i} peer{i} {mc} {mdb} {mdr}"
+        args = f"java peer.Server 1.0 {i} peer{i} {mc} {mdb} {mdr}"
     else:
-        args = f"java -cp \".:../src/gson-2.8.6.jar\" peer.Server 1.0 {i} peer{i} {mc} {mdb} {mdr}"
+        args = f"java peer.Server 1.0 {i} peer{i} {mc} {mdb} {mdr}"
 
     print(f"Executing command '{args}'")
     peers[i] = subprocess.Popen(args, shell=True)
