@@ -35,6 +35,15 @@ public class RestoreSenderMessage extends Message {
 
     @Override
     public void answer(int id) {
+        if (this.version.equals("1.0")) {
+            this.regularAnswer(id);
+        }
+        else {
+            this.enhancedAnswer(id);
+        }
+    }
+
+    public void regularAnswer(int id) {
         // New Thread to deal with the answer
         Thread thread = new Thread(() -> {
             // Search for the chunkContent
@@ -101,5 +110,9 @@ public class RestoreSenderMessage extends Message {
             socket.close();
         });
         thread.start();
+    }
+
+    public void enhancedAnswer(int id) {
+        // TODO
     }
 }
