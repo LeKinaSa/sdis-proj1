@@ -6,9 +6,8 @@ import peer.PeerDebugger;
 import peer.Utils;
 
 import java.io.IOException;
-import java.net.DatagramPacket;
-import java.net.MulticastSocket;
-import java.net.SocketTimeoutException;
+import java.io.OutputStream;
+import java.net.*;
 
 public class RestoreSenderMessage extends Message {
     private final String fileId;
@@ -113,6 +112,47 @@ public class RestoreSenderMessage extends Message {
     }
 
     public void enhancedAnswer(int id) {
-        // TODO
+        // Search for the chunkContent
+        byte[] chunkContent = Utils.load(id, this.fileId, this.chunkNo);
+        if (chunkContent == null) {
+            return;
+        }
+
+        // Open TCP socket
+        boolean transmitted = false;
+        try (ServerSocket serverSocket = new ServerSocket(this.mdr.port)) {
+            serverSocket.setSoTimeout(1000); // TODO: check timeout
+            while (true) { // TODO: infinite loop
+                // Accept Socket Connection
+                Socket socket;
+                try {
+                    socket = serverSocket.accept();
+                }
+                catch (SocketTimeoutException exception) {
+                    if (!transmitted) {
+                        regularAnswer(id);
+                    }
+                    return;
+                }
+
+                // Write to the Socket
+                OutputStream output = socket.getOutputStream();
+                output.write(chunkContent);
+
+                // Close Socket without Losing Information
+                output.flush();
+                socket.shutdownOutput();
+                socket.close();
+
+                // Information was successfully transmitted
+                transmitted = true;
+            }
+
+        }
+        catch (IOException ex) {
+            if (!transmitted) {
+                regularAnswer(id);
+            }
+        }
     }
 }
