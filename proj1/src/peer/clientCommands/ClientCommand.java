@@ -1,11 +1,14 @@
 package peer.clientCommands;
 
+import java.rmi.NotBoundException;
+import java.rmi.RemoteException;
 import java.rmi.registry.LocateRegistry;
 import java.rmi.registry.Registry;
 import java.io.IOException;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import peer.ServerCommands;
+import java.rmi.ConnectException;
 
 public abstract class ClientCommand {
     public String accessPoint;
@@ -17,7 +20,15 @@ public abstract class ClientCommand {
             Registry registry = LocateRegistry.getRegistry();
             this.stub = (ServerCommands) registry.lookup(this.accessPoint);
         }
-        catch (Exception exception) {
+        catch (NotBoundException exception) {
+            System.err.println("Peer with ID '" + this.accessPoint + "' is not available on the RMI registry");
+            System.exit(1);
+        }
+        catch (ConnectException exception) {
+            System.err.println("rmiregistry is not running");
+            System.exit(1);
+        }
+        catch (RemoteException exception) {
             System.err.println("Client exception: " + exception.toString());
             exception.printStackTrace();
         }
