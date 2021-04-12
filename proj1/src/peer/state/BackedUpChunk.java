@@ -18,32 +18,6 @@ public class BackedUpChunk {
         this.perceivedReplicationDegree = new HashSet<>();
     }
 
-    public static BackedUpChunk fromJson() {
-        // TODO
-        return new BackedUpChunk(null, 0, 0, 0);
-    }
-
-    public String toJson() {
-        StringBuilder chunkInfo = new StringBuilder();
-        chunkInfo.append("{");
-
-        chunkInfo.append("fileId:").append(this.fileId).append(",");
-        chunkInfo.append("chunkNo:").append(this.chunkNo).append(",");
-        chunkInfo.append("size:").append(this.size).append(",");
-        chunkInfo.append("desiredReplicationDegree:").append(this.desiredReplicationDegree).append(",");
-
-        chunkInfo.append("perceivedReplicationDegree:[");
-        for (int peer : this.perceivedReplicationDegree) {
-            chunkInfo.append(peer).append(",");
-        }
-        if (chunkInfo.lastIndexOf(",") == (chunkInfo.length() - 1)) {
-            chunkInfo.deleteCharAt(chunkInfo.length() - 1);
-        }
-
-        chunkInfo.append("}");
-        return chunkInfo.toString();
-    }
-
     public String getFileId() {
         return this.fileId;
     }

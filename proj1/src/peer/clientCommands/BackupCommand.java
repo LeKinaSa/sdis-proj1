@@ -36,7 +36,7 @@ public class BackupCommand extends ClientCommand {
             byte[] buffer = new byte[fileSize];
             try {
                 in.read(buffer);
-                stub.backupFile(this.fileName, buffer, this.replicationFactor);
+                stub.backupFile(this.fileId(this.fileName), buffer, this.replicationFactor);
             }
             catch (IOException exception) {
                 System.err.println("Client exception: " + exception.toString());

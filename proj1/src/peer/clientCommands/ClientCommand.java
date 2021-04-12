@@ -2,7 +2,9 @@ package peer.clientCommands;
 
 import java.rmi.registry.LocateRegistry;
 import java.rmi.registry.Registry;
-
+import java.io.IOException;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import peer.ServerCommands;
 
 public abstract class ClientCommand {
@@ -39,5 +41,14 @@ public abstract class ClientCommand {
             default:
                 return null;
         }
+    }
+
+    public static String fileId(String path) {
+        // create object of Path
+        Path fullPath = Paths.get(path);
+  
+        String fileName = fullPath.getFileName().toString();
+  
+        return String.valueOf(fileName.hashCode());
     }
 }

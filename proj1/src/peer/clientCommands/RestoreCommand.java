@@ -20,7 +20,7 @@ public class RestoreCommand extends ClientCommand {
     public void execute() {
         System.out.println("Executing restore...");
         try {
-            byte[] fileBytes = stub.restoreFile(this.file);
+            byte[] fileBytes = stub.restoreFile(this.fileId(this.file));
             // System.out.println("File Restored: " + new String(fileBytes));
 
             try (FileOutputStream fos = new FileOutputStream(this.file)) {

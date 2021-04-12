@@ -8,14 +8,18 @@ import java.net.DatagramPacket;
 import java.net.DatagramSocket;
 import java.net.InetAddress;
 import java.net.SocketException;
+import java.nio.charset.StandardCharsets;
 import java.util.Arrays;
 import java.util.Random;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
 
+import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
 
 public class Utils {
+    private static final Gson gson = new GsonBuilder().setPrettyPrinting().create();
     private static ScheduledExecutorService autoSave;
 
     public static int getRandomNumber(int min, int max) {
@@ -160,44 +164,26 @@ public class Utils {
     }
 
     public static PeerState loadState(int peerId) {
-        File file = new File("../peer-data");
-        if (!file.exists()) {
-            return new PeerState();
-        }
-        file = new File("../peer-data/" + peerId);
-        if (!file.exists()) {
-            return new PeerState();
-        }
-        file = new File("../peer-data/" + peerId + "/state.json");
-        if (!file.exists()) {
-            return new PeerState();
-        }
-        try (FileInputStream stream = new FileInputStream("../peer-data/" + peerId + "/state.json")) {
-            StringBuilder fileInfo = new StringBuilder();
-            int byteRead = stream.read();
-            while (byteRead != -1) {
-                fileInfo.append(byteRead);
-                byteRead = stream.read();
+        PeerState state = null;
+        File peerStateFile = new File("../peer-data/" + peerId + "/state.json");
+        if (peerStateFile.exists()) {
+            try (BufferedReader reader = new BufferedReader(new InputStreamReader(new FileInputStream(peerStateFile), StandardCharsets.UTF_8))) {
+                state = Utils.gson.fromJson(reader, PeerState.class);
             }
-            return PeerState.fromJson(fileInfo.toString());
+            catch(Exception ignored) { }
         }
-        catch (IOException exception) {
-            return new PeerState();
+        if (state == null) {
+            state = new PeerState();
         }
+        return state;
     }
 
     public static void saveState(int peerId) {
-        File directory = new File("../peer-data/" + peerId);
-        File file      = new File("../peer-data/" + peerId + "/state.json");
-
-        if ((!directory.exists()) || (!directory.isDirectory())) {
-            file.getParentFile().mkdirs();
-        }
+        File peerStateFile = new File("../peer-data/" + peerId + "/state.json");
         try {
-            file.createNewFile();
-            try (FileOutputStream stream = new FileOutputStream("../peer-data/" + peerId + "/state.json")) {
-                PrintWriter writer = new PrintWriter(stream, true);
-                writer.println(ClientEndpoint.state.toJson());
+            peerStateFile.createNewFile();
+            try (BufferedWriter writer = new BufferedWriter(new OutputStreamWriter(new FileOutputStream(peerStateFile), StandardCharsets.UTF_8))) {
+                writer.write(Utils.gson.toJson(ClientEndpoint.state));
             }
         }
         catch (IOException ignored) { }

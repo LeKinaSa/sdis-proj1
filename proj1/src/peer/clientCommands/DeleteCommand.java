@@ -18,7 +18,7 @@ public class DeleteCommand extends ClientCommand {
     public void execute() {
         System.out.println("Executing delete...");
         try {
-            stub.deleteFile(this.file);
+            stub.deleteFile(this.fileId(this.file));
         } catch (Exception e) {
             System.err.println("Client exception: " + e.toString());
             e.printStackTrace();
