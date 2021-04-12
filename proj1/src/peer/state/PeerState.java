@@ -273,6 +273,7 @@ public class PeerState {
             if (file.correspondsTo(fileId)) {
                 // File Already Backed Up in the System
                 file.changeReplicationDegree(replicationDegree);
+                file.clearReplicationDegree();
                 return;
             }
         }

@@ -107,6 +107,10 @@ public class BackedUpFile {
         this.desiredReplicationDegree = desiredReplicationDegree;
     }
 
+    public void clearReplicationDegree() {
+        this.perceivedReplicationDegree.clear();
+    }
+
     public void putChunk(int chunkNo, int peerId) {
         if (!this.perceivedReplicationDegreePerChunk.containsKey(chunkNo)) {
             this.perceivedReplicationDegreePerChunk.put(chunkNo, new HashSet<>());
