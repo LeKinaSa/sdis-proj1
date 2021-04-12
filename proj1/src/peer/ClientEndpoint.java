@@ -54,7 +54,7 @@ public class ClientEndpoint implements ServerCommands { // Peer endpoint that th
         return this.peerId;
     }
 
-    public void backupFile(String fileName, byte[] fileContents, int replicationDegree) {
+    public void backupFile(String fileName, String fileId, byte[] fileContents, int replicationDegree) {
         PeerDebugger.println("backupFile()");
 
         int fileSize = fileContents.length;
@@ -62,7 +62,6 @@ public class ClientEndpoint implements ServerCommands { // Peer endpoint that th
         int toBackUp;
         int chunk = 0;
 
-        String fileId = fileName; // TODO: get fileId from fileName
         ClientEndpoint.state.insertFile(fileName, fileId, replicationDegree);
         while (backedUp < fileSize) {
             toBackUp = Math.min(Message.CHUNK_SIZE, fileSize - backedUp);

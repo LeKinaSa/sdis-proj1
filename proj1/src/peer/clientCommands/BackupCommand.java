@@ -28,7 +28,7 @@ public class BackupCommand extends ClientCommand {
                 in = new FileInputStream(file);
             }
             catch (FileNotFoundException exception) {
-                System.out.println("File: " + fileName + " not found");
+                System.out.println("File: " + this.fileName + " not found");
                 return;
             }
 
@@ -36,7 +36,7 @@ public class BackupCommand extends ClientCommand {
             byte[] buffer = new byte[fileSize];
             try {
                 in.read(buffer);
-                stub.backupFile(this.fileId(this.fileName), buffer, this.replicationFactor);
+                stub.backupFile(this.fileName, this.fileId(this.fileName), buffer, this.replicationFactor);
             }
             catch (IOException exception) {
                 System.err.println("Client exception: " + exception.toString());
