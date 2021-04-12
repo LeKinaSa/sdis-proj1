@@ -120,6 +120,7 @@ public class RestoreSenderMessage extends Message {
 
         // Open TCP socket
         boolean transmitted = false;
+        Utils.pause(Utils.getRandomNumber(0, 401)); // TODO: is this line needed so that all the connections don't happen at the same time
         try (ServerSocket serverSocket = new ServerSocket(this.mdr.port)) {
             serverSocket.setSoTimeout(1000); // TODO: check timeout
             while (true) { // TODO: infinite loop
