@@ -6,7 +6,6 @@ import peer.PeerDebugger;
 import peer.Utils;
 
 import java.io.IOException;
-import java.io.OutputStream;
 import java.net.*;
 
 public class RestoreSenderMessage extends Message {
@@ -34,19 +33,6 @@ public class RestoreSenderMessage extends Message {
 
     @Override
     public void answer(int id) {
-        // New Thread to deal with the answer
-        Thread thread = new Thread(() -> {
-            if (this.version.equals("1.0")) {
-                this.regularAnswer(id);
-            }
-            else {
-                this.enhancedAnswer(id);
-            }
-        });
-        thread.start();
-    }
-
-    public void regularAnswer(int id) {
         // Search for the chunkContent
         byte[] chunkContent = Utils.load(id, this.fileId, this.chunkNo);
         if (chunkContent == null) {
@@ -111,40 +97,4 @@ public class RestoreSenderMessage extends Message {
         socket.close();
     }
 
-    public void enhancedAnswer(int id) {
-        // Search for the chunkContent
-        byte[] chunkContent = Utils.load(id, this.fileId, this.chunkNo);
-        if (chunkContent == null) {
-            return;
-        }
-
-        // Open TCP socket
-        Utils.pause(Utils.getRandomNumber(0, 401)); // TODO: is this line needed so that all the connections don't happen at the same time
-        try (ServerSocket serverSocket = new ServerSocket(this.mdr.port)) {
-            serverSocket.setSoTimeout(1000); // TODO: check timeout
-            // Accept Socket Connection
-            Socket socket;
-            try {
-                socket = serverSocket.accept();
-            }
-            catch (SocketTimeoutException exception) {
-                regularAnswer(id);
-                return;
-            }
-
-            // Write to the Socket
-            OutputStream output = socket.getOutputStream();
-            output.write(chunkContent);
-
-            // Close Socket without Losing Information
-            output.flush();
-            socket.shutdownOutput();
-            socket.close();
-
-            // Information was successfully transmitted
-        }
-        catch (IOException ex) {
-            regularAnswer(id);
-        }
-    }
 }

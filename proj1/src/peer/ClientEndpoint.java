@@ -6,7 +6,6 @@ import peer.state.PeerState;
 import java.io.*;
 import java.net.DatagramPacket;
 import java.net.MulticastSocket;
-import java.net.Socket;
 import java.util.Arrays;
 import java.util.HashSet;
 import java.util.Set;
@@ -18,8 +17,6 @@ public class ClientEndpoint implements ServerCommands { // Peer endpoint that th
     private Channel mc, mdb, mdr;
     private final String version;
     private final int peerId;
-
-    // TODO: check fileName (if this file is in a directory, should it be in a directory once it is inside the peer-data folder? -> probably not)
 
     public ClientEndpoint(String version, int id) {
         ClientEndpoint.state = Utils.loadState(id);
@@ -114,18 +111,6 @@ public class ClientEndpoint implements ServerCommands { // Peer endpoint that th
     }
 
     public byte[] restoreFile(String fileName) {
-        PeerDebugger.println("restoreFile()");
-
-        if (!this.version.equals("1.0")) {
-            byte[] file = this.restoreFileEnhanced(fileName);
-            if (file != null) {
-                return file;
-            }
-        }
-        return this.restoreFileRegular(fileName);
-    }
-
-    public byte[] restoreFileRegular(String fileName) {
         // TODO: introduce timeout? so it doesn't get stuck here forever
         // aux will be holding the file data
         ByteArrayOutputStream aux = new ByteArrayOutputStream();
@@ -185,60 +170,6 @@ public class ClientEndpoint implements ServerCommands { // Peer endpoint that th
             // Chunk received and stored -> continue to next chunk
             chunk ++;
         }
-        return aux.toByteArray();
-    }
-
-    public byte[] restoreFileEnhanced(String fileName) {
-        // aux will be holding the file data
-        ByteArrayOutputStream aux = new ByteArrayOutputStream();
-
-        int chunk = 0;
-        int chunkSize = Message.CHUNK_SIZE;
-        byte[] buf = new byte[Message.MESSAGE_SIZE];
-        int readSize;
-        // TODO: verify if the next calls blocks in the case that the other peer isn't enhanced
-        // TODO: verify that only 1 peer connects to this socket
-        try (Socket socket = new Socket(this.mdr.ip, this.mdr.port)) {
-            InputStream input = socket.getInputStream();
-            while (chunkSize >= Message.CHUNK_SIZE) {
-                // Get message
-                Message message = new RestoreSenderMessage(this.mc, this.mdb, this.mdr, this.version, this.peerId, fileName, chunk);
-                // Send message
-                Utils.sendMessage(message);
-                // TODO: review this Part (if UDP message is lost, the next call will block)
-
-                // Receive answer
-                readSize = input.read(buf, 0, buf.length);
-                if (readSize < 0) {
-                    // TODO: what should i do in this situation (?)
-                    continue; // TODO: could this be because the UDP failed to deliver?
-                }
-
-                // Verify if the message obtained is the one we need
-                Message answer = Message.parse(this.mc, this.mdb, this.mdr, new DatagramPacket(buf, readSize));
-                if (answer instanceof RestoreReceiverMessage) {
-                    RestoreReceiverMessage restoreAnswer = (RestoreReceiverMessage) answer;
-                    // Verify if the chunk is the one we need
-                    if (restoreAnswer.correspondsTo(fileName, chunk)) {
-                        // Write chunk to aux
-                        try {
-                            aux.write(restoreAnswer.getChunk());
-                        } catch (IOException exception) {
-                            continue;
-                        }
-                        // Check chunk size
-                        chunkSize = restoreAnswer.getChunk().length;
-                    }
-                }
-
-                // Chunk received and stored -> continue to next chunk
-                chunk ++;
-            }
-        }
-        catch (IOException exception) {
-            return null;
-        }
-
         return aux.toByteArray();
     }
 

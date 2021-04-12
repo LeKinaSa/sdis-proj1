@@ -253,12 +253,12 @@ public class PeerState {
         peerState.append("----------------------------------------\n");
         peerState.append("Files:\n");
         for (BackedUpFile file : this.files) {
-            peerState.append(file.toString());
+            peerState.append(file.toString()).append("\n");
         }
         peerState.append("----------------------------------------\n");
         peerState.append("Chunks:\n");
         for (BackedUpChunk chunk : this.chunks) {
-            peerState.append(chunk.toString());
+            peerState.append(chunk.toString()).append("\n");
         }
         peerState.append("----------------------------------------\n");
         return peerState.toString();
