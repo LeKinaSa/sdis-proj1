@@ -294,7 +294,13 @@ public class PeerState {
         StringBuilder peerState = new StringBuilder();
         peerState.append("----------------------------------------\n");
         peerState.append("Current Capacity: ").append(this.currentCapacity).append(" Bytes\n");
-        peerState.append("Storage Capacity: ").append(this.storageCapacity).append(" Bytes\n");
+        peerState.append("Storage Capacity: ");
+        if (this.storageCapacity == PeerState.UNLIMITED_STORAGE) {
+            peerState.append("Unlimited\n");
+        }
+        else {
+            peerState.append(this.storageCapacity).append(" Bytes\n");
+        }
         peerState.append("----------------------------------------\n");
         peerState.append("Files:\n");
         for (BackedUpFile file : this.files) {
