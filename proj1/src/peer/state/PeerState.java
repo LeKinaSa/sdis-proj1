@@ -10,6 +10,7 @@ import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
+import java.util.regex.Pattern;
 
 public class PeerState {
     private static final int UNLIMITED_STORAGE = -1;
@@ -25,6 +26,56 @@ public class PeerState {
         this.chunks = new ArrayList<>();
         this.storageCapacity = PeerState.UNLIMITED_STORAGE;
         this.removed = new ArrayList<>();
+    }
+
+    public static PeerState fromJson(String fileInfo) {
+        Pattern pattern = Pattern.compile("");
+        // TODO
+        return new PeerState();
+    }
+
+    public String toJson() {
+        StringBuilder info = new StringBuilder();
+        info.append("{");
+
+        // Files
+        info.append("files:[");
+        for (BackedUpFile file : this.files) {
+            info.append(file.toJson()).append(",");
+        }
+        if (info.lastIndexOf(",") == (info.length() - 1)) {
+            info.deleteCharAt(info.length() - 1);
+        }
+        info.append("],");
+
+        // Chunks
+        info.append("chunks:[");
+        for (BackedUpChunk chunk : this.chunks) {
+            info.append(chunk.toJson()).append(",");
+        }
+        if (info.lastIndexOf(",") == (info.length() - 1)) {
+            info.deleteCharAt(info.length() - 1);
+        }
+        info.append("],");
+
+        // Removed
+        info.append("removed:[");
+        for (RemovedFile file : this.removed) {
+            info.append(file.toJson()).append(",");
+        }
+        if (info.lastIndexOf(",") == (info.length() - 1)) {
+            info.deleteCharAt(info.length() - 1);
+        }
+        info.append("],");
+
+        // Current Capacity
+        info.append("currentCapacity:").append(this.currentCapacity).append(",");
+
+        // Storage Capacity
+        info.append("storageCapacity:").append(this.storageCapacity);
+
+        info.append("}");
+        return info.toString();
     }
 
     public boolean fits(int size) {

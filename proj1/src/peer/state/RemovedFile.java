@@ -11,6 +11,30 @@ public class RemovedFile {
         this.peers = peers;
     }
 
+    public static RemovedFile fromJson() {
+        // TODO
+        return new RemovedFile(null, null);
+    }
+
+    public String toJson() {
+        StringBuilder removedFileInfo = new StringBuilder();
+        removedFileInfo.append("{");
+
+        removedFileInfo.append("fileId:").append(this.fileId).append(",");
+
+        removedFileInfo.append("peers:[");
+        for (int peer : this.peers) {
+            removedFileInfo.append(peer).append(",");
+        }
+        if (removedFileInfo.lastIndexOf(",") == (removedFileInfo.length() - 1)) {
+            removedFileInfo.deleteCharAt(removedFileInfo.length() - 1);
+        }
+        removedFileInfo.append("]");
+
+        removedFileInfo.append("}");
+        return removedFileInfo.toString();
+    }
+
     public String getFileId() {
         return this.fileId;
     }

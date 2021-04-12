@@ -80,8 +80,4 @@ esac
 
 # echo "java test.TestApp ${pap} ${oper} ${opernd_1} ${rep_deg}"
 
-# Windows
-#java -cp ".;./gson-2.8.6.jar" peer.TestApp ${pap} ${oper} ${opernd_1} ${rep_deg}
-
-# Linux
-java -cp ".:./gson-2.8.6.jar" peer.TestApp ${pap} ${oper} ${opernd_1} ${rep_deg}
+java peer.TestApp ${pap} ${oper} ${opernd_1} ${rep_deg}
