@@ -40,7 +40,7 @@ public class PeerState {
     public static PeerState fromJson(String info) {
         // Storage Capacity
         int lastSeparator = info.lastIndexOf(":");
-        String storageCapacityStr = info.substring(lastSeparator + 1, info.length() - 1);
+        String storageCapacityStr = info.substring(lastSeparator + 1, info.length() - 2);
         int storageCapacity = Integer.parseInt(storageCapacityStr);
         info = info.substring(0, lastSeparator);
 

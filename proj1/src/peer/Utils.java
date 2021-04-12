@@ -207,7 +207,7 @@ public class Utils {
             StringBuilder fileInfo = new StringBuilder();
             int byteRead = stream.read();
             while (byteRead != -1) {
-                fileInfo.append(byteRead);
+                fileInfo.append((char)byteRead);
                 byteRead = stream.read();
             }
             return PeerState.fromJson(fileInfo.toString());
@@ -235,7 +235,7 @@ public class Utils {
     }
 
     public static void scheduleSave(int peerId) {
-        final int delay = 20;
+        final int delay = 3;
         if ((autoSave != null) && (!autoSave.isShutdown())) {
             autoSave.shutdownNow();
         }
