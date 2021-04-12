@@ -2,7 +2,7 @@ package peer;
 
 import peer.messages.Message;
 import peer.messages.StartMessage;
-
+import java.rmi.ConnectException;
 import java.net.UnknownHostException;
 import java.rmi.registry.Registry;
 import java.rmi.registry.LocateRegistry;
@@ -42,6 +42,10 @@ public class Server {
             // Bind the remote object's stub in the registry
             Registry registry = LocateRegistry.getRegistry();
             registry.bind(accessPoint, stub);
+        }
+        catch (ConnectException exception) {
+            PeerDebugger.println("ERROR: rmiregistry is not running");
+            return;
         }
         catch (Exception exception) {
             System.err.println("Server exception: " + exception.toString());
