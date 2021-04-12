@@ -10,6 +10,7 @@ try:
 except FileNotFoundError:
     pass
 
-directories = ["peer", "peer/clientCommands"]
-print(" ".join(["javac"] + list(map(lambda x : x + "/*.java", directories)) + ["-d", "../out"]))
-subprocess.check_call(" ".join(["javac"] + list(map(lambda x : x + "/*.java", directories)) + ["-d", "../out"]), shell=True)
+command = "javac -cp \".:./gson-2.8.6.jar\" peer/*.java peer/clientCommands/*.java peer/messages/*.java peer/state/*.java -d ../out"
+
+print(command)
+subprocess.check_call(command, shell=True)
