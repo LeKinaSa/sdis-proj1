@@ -119,43 +119,32 @@ public class RestoreSenderMessage extends Message {
         }
 
         // Open TCP socket
-        boolean transmitted = false;
         Utils.pause(Utils.getRandomNumber(0, 401)); // TODO: is this line needed so that all the connections don't happen at the same time
         try (ServerSocket serverSocket = new ServerSocket(this.mdr.port)) {
             serverSocket.setSoTimeout(1000); // TODO: check timeout
-            // Loop until a transmission is executed
-            while (true) {
-                // Accept Socket Connection
-                Socket socket;
-                try {
-                    socket = serverSocket.accept();
-                }
-                catch (SocketTimeoutException exception) {
-                    if (!transmitted) {
-                        regularAnswer(id);
-                    }
-                    return;
-                }
-
-                // Write to the Socket
-                OutputStream output = socket.getOutputStream();
-                output.write(chunkContent);
-
-                // Close Socket without Losing Information
-                output.flush();
-                socket.shutdownOutput();
-                socket.close();
-
-                // Information was successfully transmitted
-                transmitted = true;
-                break;
+            // Accept Socket Connection
+            Socket socket;
+            try {
+                socket = serverSocket.accept();
+            }
+            catch (SocketTimeoutException exception) {
+                regularAnswer(id);
+                return;
             }
 
+            // Write to the Socket
+            OutputStream output = socket.getOutputStream();
+            output.write(chunkContent);
+
+            // Close Socket without Losing Information
+            output.flush();
+            socket.shutdownOutput();
+            socket.close();
+
+            // Information was successfully transmitted
         }
         catch (IOException ex) {
-            if (!transmitted) {
-                regularAnswer(id);
-            }
+            regularAnswer(id);
         }
     }
 }
