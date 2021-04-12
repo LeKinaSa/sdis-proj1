@@ -39,6 +39,6 @@ def kill_zombies():
     for i in peers:
         peers[i].kill()
 
-rmiregistry.wait()
-
 atexit.register(kill_zombies)
+
+rmiregistry.wait()
