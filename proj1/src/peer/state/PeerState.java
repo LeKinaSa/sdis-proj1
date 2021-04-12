@@ -293,8 +293,8 @@ public class PeerState {
     public String toString() {
         StringBuilder peerState = new StringBuilder();
         peerState.append("----------------------------------------\n");
-        peerState.append("Current Capacity: ").append(this.currentCapacity).append(" Bytes\n");
-        peerState.append("Storage Capacity: ").append(this.storageCapacity).append(" Bytes\n");
+        peerState.append("Used    Capacity: ").append(this.currentCapacity).append(" Bytes\n");
+        peerState.append("Maximum Capacity: ").append(this.storageCapacity).append(" Bytes\n");
         peerState.append("----------------------------------------\n");
         peerState.append("Files:\n");
         for (BackedUpFile file : this.files) {
