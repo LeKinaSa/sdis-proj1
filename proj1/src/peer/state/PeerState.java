@@ -137,7 +137,7 @@ public class PeerState {
         for (BackedUpFile file : this.files) {
             if (file.correspondsTo(fileId)) {
                 // File Already Backed Up in the System
-                PeerDebugger.println("File Already backed up in the system");
+                file.changeReplicationDegree(replicationDegree);
                 return;
             }
         }

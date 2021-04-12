@@ -8,7 +8,7 @@ import java.util.Set;
 public class BackedUpFile {
     private final String pathname;
     private final String fileId;
-    private final int desiredReplicationDegree;
+    private int desiredReplicationDegree;
     private final Map<Integer, Set<Integer>> perceivedReplicationDegreePerChunk;
 
     BackedUpFile(String pathname, String fileId, int replicationDegree) {
@@ -20,6 +20,10 @@ public class BackedUpFile {
 
     public boolean correspondsTo(String fileId) {
         return this.fileId.equals(fileId);
+    }
+
+    public void changeReplicationDegree(int desiredReplicationDegree) {
+        this.desiredReplicationDegree = desiredReplicationDegree;
     }
 
     public void putChunk(int chunkNo, int peerId) {
