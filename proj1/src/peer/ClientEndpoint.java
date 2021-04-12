@@ -111,7 +111,6 @@ public class ClientEndpoint implements ServerCommands { // Peer endpoint that th
     }
 
     public byte[] restoreFile(String fileName) {
-        // TODO: introduce timeout? so it doesn't get stuck here forever
         // aux will be holding the file data
         ByteArrayOutputStream aux = new ByteArrayOutputStream();
 
@@ -126,6 +125,7 @@ public class ClientEndpoint implements ServerCommands { // Peer endpoint that th
         }
         try {
             socket.joinGroup(mdr.ip);
+            socket.setSoTimeout(3000); // Timeout so it doesn't get stuck if the answer is never sent back
         }
         catch (IOException exception) {
             PeerDebugger.println("Error occurred: " + exception.getMessage());
