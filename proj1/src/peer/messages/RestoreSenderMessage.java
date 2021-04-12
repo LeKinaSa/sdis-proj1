@@ -123,7 +123,8 @@ public class RestoreSenderMessage extends Message {
         Utils.pause(Utils.getRandomNumber(0, 401)); // TODO: is this line needed so that all the connections don't happen at the same time
         try (ServerSocket serverSocket = new ServerSocket(this.mdr.port)) {
             serverSocket.setSoTimeout(1000); // TODO: check timeout
-            while (true) { // TODO: infinite loop
+            // Loop until a transmission is executed
+            while (true) {
                 // Accept Socket Connection
                 Socket socket;
                 try {
@@ -147,6 +148,7 @@ public class RestoreSenderMessage extends Message {
 
                 // Information was successfully transmitted
                 transmitted = true;
+                break;
             }
 
         }
