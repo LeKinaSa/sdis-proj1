@@ -1,14 +1,14 @@
 package peer.clientCommands;
 
 public class ReclaimCommand extends ClientCommand {
-    private int diskSpace; // Disk Space Used to Store the Chunks (in KByte)
+    private final int diskSpace; // Disk Space Used to Store the Chunks (in KByte)
     
     public ReclaimCommand(String[] args) {
         super(args);
         assert (args[1].equals("RECLAIM"));
 
         if (args.length != 3) {
-            System.out.println("java TestApp <peer_ap> RECLAIM <diskSpace>");
+            System.out.println("java peer.TestApp <peer_ap> RECLAIM <diskSpace>");
             throw new IllegalArgumentException();
         }
 
@@ -16,9 +16,9 @@ public class ReclaimCommand extends ClientCommand {
     }
 
     public void execute() {
-        System.out.println("hi");
+        System.out.println("Executing reclaim...");
         try {
-            stub.reclaimSpace(0);
+            stub.reclaimSpace(this.diskSpace);
         } catch (Exception e) {
             System.err.println("Client exception: " + e.toString());
             e.printStackTrace();
