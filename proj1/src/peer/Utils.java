@@ -9,7 +9,9 @@ import java.net.DatagramSocket;
 import java.net.InetAddress;
 import java.net.SocketException;
 import java.util.Arrays;
+import java.util.HashSet;
 import java.util.Random;
+import java.util.Set;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
@@ -36,6 +38,15 @@ public class Utils {
         }
 
         return bracketPos;
+    }
+
+    public static Set<Integer> parseNumberList(String numbersStr) {
+        Set<Integer> peers = new HashSet<>();
+
+        for (String peer : numbersStr.split(",")) {
+            peers.add(Integer.parseInt(peer));
+        }
+        return peers;
     }
 
     public static int getRandomNumber(int min, int max) {

@@ -1,7 +1,6 @@
 package peer.state;
 
 import peer.ClientEndpoint;
-import peer.PeerDebugger;
 import peer.Utils;
 import peer.messages.Message;
 import peer.messages.ReclaimReceiverMessage;
@@ -10,10 +9,9 @@ import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
-import java.util.regex.Pattern;
 
 public class PeerState {
-    // {files:[],chunks:[{fileId:-1147906284,chunkNo:0,size:8,desiredReplicationDegree:1,perceivedReplicationDegree:[2,3,4}],removed:[],currentCapacity:8,storageCapacity:-1}
+    // {files:[],chunks:[{fileId:-1147906284,chunkNo:0,size:8,desiredReplicationDegree:1,perceivedReplicationDegree:[2,3,4]}],removed:[],currentCapacity:8,storageCapacity:-1}
     // {files:[{pathname:test.txt,fileId:-1147906284,desiredReplicationDegree:1,perceivedReplicationDegreePerChunk:{0:[2,3,4]}}],chunks:[],removed:[],currentCapacity:0,storageCapacity:-1}
     private static final int UNLIMITED_STORAGE = -1;
 
@@ -26,14 +24,105 @@ public class PeerState {
     public PeerState() {
         this.files = new ArrayList<>();
         this.chunks = new ArrayList<>();
-        this.storageCapacity = PeerState.UNLIMITED_STORAGE;
         this.removed = new ArrayList<>();
+        this.currentCapacity = 0;
+        this.storageCapacity = PeerState.UNLIMITED_STORAGE;
+    }
+    
+    public PeerState(List<BackedUpFile> files, List<BackedUpChunk> chunks, List<RemovedFile> removed, int currentCapacity, int storageCapacity) {
+        this.files = files;
+        this.chunks = chunks;
+        this.removed = removed;
+        this.currentCapacity = currentCapacity;
+        this.storageCapacity = storageCapacity;
     }
 
-    public static PeerState fromJson(String fileInfo) {
-        Pattern pattern = Pattern.compile("");
-        // TODO
-        return new PeerState();
+    public static PeerState fromJson(String info) {
+        // Storage Capacity
+        int lastSeparator = info.lastIndexOf(":");
+        String storageCapacityStr = info.substring(lastSeparator + 1, info.length() - 1);
+        int storageCapacity = Integer.parseInt(storageCapacityStr);
+        info = info.substring(0, lastSeparator);
+
+        // Current Capacity
+        lastSeparator = info.lastIndexOf(":");
+        String currentCapacityStr = info.substring(lastSeparator + 1, info.lastIndexOf(","));
+        int currentCapacity = Integer.parseInt(currentCapacityStr);
+        info = info.substring(0, lastSeparator);
+
+        // Files
+        // {files:[{pathname:test.txt,fileId:-1147906284,desiredReplicationDegree:1,perceivedReplicationDegreePerChunk:{0:[2,3,4]}}],chunks:[],removed:[],currentCapacity
+        List<BackedUpFile> files = new ArrayList<>();
+        int fileStart = 8;
+        int fileEnd;
+
+        while (true) {
+            if (info.contains("files:[]")) {
+                fileEnd = fileStart;
+                break;
+            }
+
+            fileEnd = Utils.findClosingBracket(info, fileStart, '{', '}');
+
+            BackedUpFile file = BackedUpFile.fromJson(info.substring(fileStart, fileEnd + 1));
+            files.add(file);
+
+            if (info.charAt(fileEnd + 1) == ']') {
+                break;
+            }
+
+            fileStart = fileEnd + 2;
+        }
+
+        info = info.substring(fileEnd + 1);
+        int chunkStart = info.indexOf("[");
+        int chunkEnd;
+        List<BackedUpChunk> chunks = new ArrayList<>();
+
+        while (true) {
+            if (info.contains("chunks:[]")) {
+                chunkEnd = chunkStart;
+                break;
+            }
+            if (info.charAt(chunkStart) == '[') {
+                chunkStart = info.indexOf("{");
+            } 
+            chunkEnd = Utils.findClosingBracket(info, chunkStart, '{', '}');
+
+            BackedUpChunk chunk = BackedUpChunk.fromJson(info.substring(chunkStart, chunkEnd + 1));
+            chunks.add(chunk);
+
+            if (info.charAt(chunkEnd + 1) == ']') {
+                break;
+            }
+            chunkStart = chunkEnd + 2;
+        }
+
+        info = info.substring(chunkEnd + 1);
+        int removedStart = info.indexOf("[");
+        int removedEnd;
+        List<RemovedFile> removed = new ArrayList<>();
+
+        while (true) {
+            if (info.contains("removed:[]")) {
+                break;
+            }
+            if (info.charAt(removedStart) == '[') {
+                removedStart = info.indexOf("{");
+            } 
+            removedEnd = Utils.findClosingBracket(info, removedStart, '{', '}');
+
+            RemovedFile removedFile = RemovedFile.fromJson(info.substring(removedStart, removedEnd + 1));
+            removed.add(removedFile);
+
+            if (info.charAt(removedEnd + 1) == ']') {
+                break;
+            }
+
+            removedStart = removedEnd + 2;
+        }
+
+        return new PeerState(files, chunks, removed, currentCapacity, storageCapacity);
     }
 
     public String toJson() {

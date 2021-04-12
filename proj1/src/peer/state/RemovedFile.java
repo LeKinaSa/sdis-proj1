@@ -1,6 +1,7 @@
 package peer.state;
 
 import peer.PeerDebugger;
+import peer.Utils;
 
 import java.util.HashSet;
 import java.util.Set;
@@ -14,15 +15,14 @@ public class RemovedFile {
         this.peers = peers;
     }
 
-    public static RemovedFile fromJson(String fileInfo) {
-        String fileId = fileInfo.substring(fileInfo.indexOf(":") + 1, fileInfo.indexOf(","));
-        Set<Integer> peers = new HashSet<>();
-        String peersStr = fileInfo.substring(fileInfo.indexOf("[") + 1, fileInfo.indexOf("]"));
-        PeerDebugger.println(peersStr);
-        String[] peersList = peersStr.split(",");
-        for (String peer : peersList) {
-            peers.add(Integer.parseInt(peer));
-        }
+    public static RemovedFile fromJson(String info) {
+        // File Id
+        String fileId = info.substring(info.indexOf(":") + 1, info.indexOf(","));
+
+        // Peers
+        String peersStr = info.substring(info.indexOf("[") + 1, info.indexOf("]"));
+        Set<Integer> peers = Utils.parseNumberList(peersStr);
+
         return new RemovedFile(fileId, peers);
     }
 

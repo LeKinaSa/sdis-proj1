@@ -1,5 +1,7 @@
 package peer.state;
 
+import peer.Utils;
+
 import java.util.HashSet;
 import java.util.Set;
 
@@ -18,9 +20,39 @@ public class BackedUpChunk {
         this.perceivedReplicationDegree = new HashSet<>();
     }
 
-    public static BackedUpChunk fromJson() {
-        // TODO
-        return new BackedUpChunk(null, 0, 0, 0);
+    public BackedUpChunk(String fileId, int chunkNo, int size, int desiredReplicationDegree, Set<Integer> perceivedReplicationDegree) {
+        this.fileId = fileId;
+        this.chunkNo = chunkNo;
+        this.size = size;
+        this.desiredReplicationDegree = desiredReplicationDegree;
+        this.perceivedReplicationDegree = perceivedReplicationDegree;
+    }
+
+    public static BackedUpChunk fromJson(String info) {
+        // FileId
+        String fileId = info.substring(info.indexOf(":") + 1, info.indexOf(","));
+        info = info.substring(info.indexOf(",") + 1);
+
+        // ChunkNo
+        String chunkNoStr = info.substring(info.indexOf(":") + 1, info.indexOf(","));
+        int chunkNo = Integer.parseInt(chunkNoStr);
+        info = info.substring(info.indexOf(",") + 1);
+
+        // Size
+        String sizeStr = info.substring(info.indexOf(":") + 1, info.indexOf(","));
+        int size = Integer.parseInt(sizeStr);
+        info = info.substring(info.indexOf(",") + 1);
+
+        // Desired Replication Degree
+        String desiredReplicationDegreeStr = info.substring(info.indexOf(":") + 1, info.indexOf(","));
+        int desiredReplicationDegree = Integer.parseInt(desiredReplicationDegreeStr);
+        info = info.substring(info.indexOf(",") + 1);
+
+        // Perceived Replication Degree
+        String perceivedReplicationDegreeStr = info.substring(info.indexOf("[") + 1, info.indexOf("]"));
+        Set<Integer> perceivedReplicationDegree = Utils.parseNumberList(perceivedReplicationDegreeStr);
+
+        return new BackedUpChunk(fileId, chunkNo, size, desiredReplicationDegree, perceivedReplicationDegree);
     }
 
     public String toJson() {

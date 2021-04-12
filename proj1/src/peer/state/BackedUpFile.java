@@ -1,5 +1,7 @@
 package peer.state;
 
+import peer.Utils;
+
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
@@ -11,16 +13,61 @@ public class BackedUpFile {
     private int desiredReplicationDegree;
     private final Map<Integer, Set<Integer>> perceivedReplicationDegreePerChunk;
 
-    BackedUpFile(String pathname, String fileId, int replicationDegree) {
+    public BackedUpFile(String pathname, String fileId, int replicationDegree) {
         this.pathname = pathname;
         this.fileId = fileId;
         this.desiredReplicationDegree = replicationDegree;
         this.perceivedReplicationDegreePerChunk = new HashMap<>();
     }
 
-    public static BackedUpFile fromJson() {
-        // TODO
-        return null;
+    public BackedUpFile(String pathname, String fileId, int replicationDegree, Map<Integer, Set<Integer>> perceivedReplicationDegreePerChunk) {
+        this.pathname = pathname;
+        this.fileId = fileId;
+        this.desiredReplicationDegree = replicationDegree;
+        this.perceivedReplicationDegreePerChunk = perceivedReplicationDegreePerChunk;
+    }
+
+    public static BackedUpFile fromJson(String info) {
+        // Pathname
+        String pathname = info.substring(info.indexOf(":") + 1, info.indexOf(","));
+        info = info.substring(info.indexOf(",") + 1);
+
+        // FileId
+        String fileId = info.substring(info.indexOf(":") + 1, info.indexOf(","));
+        info = info.substring(info.indexOf(",") + 1);
+
+        // Desired Replication Degree
+        String desiredReplicationDegreeStr = info.substring(info.indexOf(":") + 1, info.indexOf(","));
+        int desiredReplicationDegree = Integer.parseInt(desiredReplicationDegreeStr);
+        info = info.substring(info.indexOf(",") + 1);
+
+        // Perceived Replication Degree
+        Map<Integer, Set<Integer>> perceivedReplicationDegree = new HashMap<>();
+        info = info.substring(info.indexOf("{") + 1, info.indexOf("}"));
+
+        String chunkNoStr;
+        int chunkNo;
+        String peersStr;
+        Set<Integer> peers;
+        while (true) {
+            // ChunkNo
+            chunkNoStr = info.substring(0, info.indexOf(":"));
+            chunkNo = Integer.parseInt(chunkNoStr);
+
+            // Peers
+            peersStr = info.substring(info.indexOf("[") + 1, info.indexOf("]"));
+            peers = Utils.parseNumberList(peersStr);
+
+            // Add to map
+            perceivedReplicationDegree.put(chunkNo, peers);
+
+            // Advance to the next chunk
+            if (info.indexOf("]") == (info.length() - 1)) {
+                break;
+            }
+            info = info.substring(info.indexOf("]") + 2);
+        }
+        return new BackedUpFile(pathname, fileId, desiredReplicationDegree, perceivedReplicationDegree);
     }
 
     public String toJson() {
