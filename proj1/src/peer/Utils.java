@@ -20,7 +20,7 @@ public class Utils {
     private static ScheduledExecutorService autoSave;
 
     public static int findClosingBracket(String text, int bracketPos, char opening, char closing) {
-        if (text.charAt(bracketPos) == opening) {
+        if (text.charAt(bracketPos) != opening) {
             PeerDebugger.println("findClosingBracket is not starting in the right place");
         }
 

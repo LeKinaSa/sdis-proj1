@@ -40,7 +40,7 @@ public class PeerState {
     public static PeerState fromJson(String info) {
         // Storage Capacity
         int lastSeparator = info.lastIndexOf(":");
-        String storageCapacityStr = info.substring(lastSeparator + 1, info.length() - 2);
+        String storageCapacityStr = info.substring(lastSeparator + 1, info.lastIndexOf("}"));
         int storageCapacity = Integer.parseInt(storageCapacityStr);
         info = info.substring(0, lastSeparator);
 
@@ -61,7 +61,6 @@ public class PeerState {
                 fileEnd = fileStart;
                 break;
             }
-
             fileEnd = Utils.findClosingBracket(info, fileStart, '{', '}');
 
             BackedUpFile file = BackedUpFile.fromJson(info.substring(fileStart, fileEnd + 1));
@@ -75,18 +74,15 @@ public class PeerState {
         }
 
         info = info.substring(fileEnd + 1);
-        int chunkStart = info.indexOf("[");
+        info = info.substring(info.indexOf(",") + 1);
+        int chunkStart = 8;
         int chunkEnd;
         List<BackedUpChunk> chunks = new ArrayList<>();
-
         while (true) {
             if (info.contains("chunks:[]")) {
                 chunkEnd = chunkStart;
                 break;
             }
-            if (info.charAt(chunkStart) == '[') {
-                chunkStart = info.indexOf("{");
-            } 
             chunkEnd = Utils.findClosingBracket(info, chunkStart, '{', '}');
 
             BackedUpChunk chunk = BackedUpChunk.fromJson(info.substring(chunkStart, chunkEnd + 1));
@@ -99,17 +95,14 @@ public class PeerState {
         }
 
         info = info.substring(chunkEnd + 1);
-        int removedStart = info.indexOf("[");
+        info = info.substring(info.indexOf(",") + 1);
+        int removedStart = 9;
         int removedEnd;
         List<RemovedFile> removed = new ArrayList<>();
-
         while (true) {
             if (info.contains("removed:[]")) {
                 break;
             }
-            if (info.charAt(removedStart) == '[') {
-                removedStart = info.indexOf("{");
-            } 
             removedEnd = Utils.findClosingBracket(info, removedStart, '{', '}');
 
             RemovedFile removedFile = RemovedFile.fromJson(info.substring(removedStart, removedEnd + 1));
