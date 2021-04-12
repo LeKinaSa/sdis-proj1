@@ -17,7 +17,7 @@ public abstract class Message {
     public static final int MESSAGE_SIZE = 65000;
     // This size tries to guarantee that the full message will be read from the socket
 
-    private static final Pattern HEADER_PATTERN = Pattern.compile("(?<version>[0-9]\\.[0-9]) +(?<type>PUTCHUNK|STORED|GETCHUNK|CHUNK|DELETE|REMOVED|DELETED|REMOVE|START|STOP) +(?<senderId>[0-9]+) +((?<fileId>.*\\..*?) +)?((?<chunkNo>[0-9]+) +)?((?<replication>[0-9]+) +)?(.*)");
+    private static final Pattern HEADER_PATTERN = Pattern.compile("(?<version>[0-9]\\.[0-9]) +(?<type>PUTCHUNK|STORED|GETCHUNK|CHUNK|DELETE|REMOVED|DELETED|REMOVE|START|STOP) +(?<senderId>[0-9]+) +((?<fileId>.*?) +)?((?<chunkNo>[0-9]+) +)?((?<replication>[0-9]+) +)?(.*)");
     private static final String CRLF = "\r\n"; // 0xD 0xA
 
     private final ChannelName channel;
