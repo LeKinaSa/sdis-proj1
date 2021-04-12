@@ -30,17 +30,21 @@ public class DeleteTargetMessage extends Message {
 
     @Override
     public void answer(int id) {
-        if (this.targetPeerId == id) {
-            // Delete all chunks from this file stored in this peer
-            Utils.deleteFile(id, this.fileId);
-            // Remove all chunks from this file from the peer state
-            ClientEndpoint.state.removeFile(this.fileId);
+        // New Thread to deal with the answer
+        Thread thread = new Thread(() -> {
+            if (this.targetPeerId == id) {
+                // Delete all chunks from this file stored in this peer
+                Utils.deleteFile(id, this.fileId);
+                // Remove all chunks from this file from the peer state
+                ClientEndpoint.state.removeFile(this.fileId);
 
-            // Message from this peer (id)
-            Message message = new DeleteReceiverMessage(this.mc, this.mdb, this.mdr, this.version, id, this.fileId);
-            // Send Message
-            Utils.sendMessage(message);
-        }
+                // Message from this peer (id)
+                Message message = new DeleteReceiverMessage(this.mc, this.mdb, this.mdr, this.version, id, this.fileId);
+                // Send Message
+                Utils.sendMessage(message);
+            }
+        });
+        thread.start();
     }
 
     public boolean correspondsTo(String fileId, int targetPeerId) {
