@@ -18,41 +18,6 @@ public class BackedUpFile {
         this.perceivedReplicationDegreePerChunk = new HashMap<>();
     }
 
-    public static BackedUpFile fromJson() {
-        // TODO
-        return null;
-    }
-
-    public String toJson() {
-        StringBuilder fileInfo = new StringBuilder();
-        fileInfo.append("{");
-
-        fileInfo.append("pathname:").append(this.pathname).append(",");
-        fileInfo.append("fileId:").append(this.fileId).append(",");
-        fileInfo.append("desiredReplicationDegree:").append(this.desiredReplicationDegree).append(",");
-
-        fileInfo.append("perceivedReplicationDegreePerChunk:{");
-        for (int chunk : this.perceivedReplicationDegreePerChunk.keySet()) {
-            fileInfo.append(chunk).append(":[");
-
-            for (int peer : this.perceivedReplicationDegreePerChunk.get(chunk)) {
-                fileInfo.append(peer).append(",");
-            }
-            if (fileInfo.lastIndexOf(",") == (fileInfo.length() - 1)) {
-                fileInfo.deleteCharAt(fileInfo.length() - 1);
-            }
-
-            fileInfo.append("],");
-        }
-        if (fileInfo.lastIndexOf(",") == (fileInfo.length() - 1)) {
-            fileInfo.deleteCharAt(fileInfo.length() - 1);
-        }
-        fileInfo.append("}");
-
-        fileInfo.append("}");
-        return fileInfo.toString();
-    }
-
     public boolean correspondsTo(String fileId) {
         return this.fileId.equals(fileId);
     }
@@ -71,19 +36,21 @@ public class BackedUpFile {
     public Set<Integer> getPeersThatBackedUpTheFile() {
         Set<Integer> peers = new HashSet<>();
         for (int chunk : this.perceivedReplicationDegreePerChunk.keySet()) {
-            peers.addAll(this.perceivedReplicationDegreePerChunk.get(chunk));
+            for (int peer : this.perceivedReplicationDegreePerChunk.get(chunk)) {
+                peers.add(peer);
+            }
         }
         return peers;
     }
 
     public String toString() {
-        StringBuilder fileState = new StringBuilder();
-        fileState.append("\tPath: ").append(this.pathname).append("\n");
-        fileState.append("\tFile: ").append(this.fileId).append("\n");
-        fileState.append("\tRepl: ").append(this.desiredReplicationDegree).append("\n");
+        String fileState = "";
+        fileState += "\tPath: " + this.pathname + "\n";
+        fileState += "\tFile: " + this.fileId + "\n";
+        fileState += "\tRepl: " + this.desiredReplicationDegree + "\n";
         for (int chunk : this.perceivedReplicationDegreePerChunk.keySet()) {
-            fileState.append("\t\tChunk ").append(chunk).append(": ").append(this.perceivedReplicationDegreePerChunk.get(chunk).size()).append("\n");
+            fileState += "\t\tChunk " + chunk + ": " + this.perceivedReplicationDegreePerChunk.get(chunk).size() + "\n";
         }
-        return fileState.toString();
+        return fileState;
     }
 }
