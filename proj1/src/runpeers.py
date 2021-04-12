@@ -26,7 +26,7 @@ print(f"rmiregistry process spawned with PID {rmiregistry.pid}")
 time.sleep(1)
 
 for i in range(npeers):
-    args = f"java peer.Server 1.0 {i} peer{i} {mc} {mdb} {mdr}"
+    args = f"java -cp \".:../src/gson-2.8.6.jar\" peer.Server 1.0 {i} peer{i} {mc} {mdb} {mdr}"
     print(f"Executing command '{args}'")
     peers[i] = subprocess.Popen(args, shell=True)
 
