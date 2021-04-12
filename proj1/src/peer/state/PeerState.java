@@ -1,6 +1,7 @@
 package peer.state;
 
 import peer.ClientEndpoint;
+import peer.PeerDebugger;
 import peer.Utils;
 import peer.messages.Message;
 import peer.messages.ReclaimReceiverMessage;
@@ -136,7 +137,7 @@ public class PeerState {
         for (BackedUpFile file : this.files) {
             if (file.correspondsTo(fileId)) {
                 // File Already Backed Up in the System
-                // TODO: file was already found - do i have to do something with this info
+                PeerDebugger.println("File Already backed up in the system");
                 return;
             }
         }

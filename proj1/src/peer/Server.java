@@ -76,9 +76,6 @@ public class Server {
         mcThread.start();
         Thread mdbThread = new ListenerThread(id, ChannelName.MDB, mc, mdb, mdr);
         mdbThread.start();
-        Thread mdrThread = new ListenerThread(id, ChannelName.MDR, mc, mdb, mdr);
-        mdrThread.start();
-        // TODO: do we need this thread ??? everything that is sent to this channel is an answer to RestoreSender
 
         // --------------- Server is Ready ---------------
         if (!version.equals("1.0")) {
