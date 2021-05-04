@@ -108,7 +108,7 @@ public class BackedUpFile {
     }
 
     public void clearReplicationDegree() {
-        this.perceivedReplicationDegree.clear();
+        this.perceivedReplicationDegreePerChunk.clear();
     }
 
     public void putChunk(int chunkNo, int peerId) {
